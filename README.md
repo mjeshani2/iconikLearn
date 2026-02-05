@@ -680,19 +680,6 @@ npm run build
 - **Documentation**: [Comprehensive guides and educational resources](./docs/)
 - **Community Forum**: Use tag `iconiklearn` for community support
 
-**Educational Inquiries**
-- **Educator Support**: educators@iconiklearn.com
-- **Curriculum Integration**: curriculum@iconiklearn.com
-- **Research Partnerships**: research@iconiklearn.com
-- **Accessibility Support**: accessibility@iconiklearn.com
-
-### Security & Compliance
-
-**Security Reporting**
-- **Vulnerability Disclosure**: security@iconiklearn.com
-- **Security Policy**: [View our security policy](./SECURITY.md)
-- **Student Data Protection**: privacy@iconiklearn.com
-
 **Educational Compliance Standards**
 - **COPPA Compliance**: Full protection for students under 13
 - **FERPA Compliance**: Educational record protection and privacy
