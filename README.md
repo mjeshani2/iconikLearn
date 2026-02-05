@@ -762,7 +762,7 @@ copies or substantial portions of the Software.
 [![GitHub Issues](https://img.shields.io/github/issues/mjeshani2/iconikLearn)](https://github.com/mjeshani2/iconikLearn/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/mjeshani2/iconikLearn)](https://github.com/mjeshani2/iconikLearn/pulls)
 
-**[⭐ Star us on GitHub](https://github.com/mjeshani2/iconikLearn)** • **[🐛 Report Bug](https://github.com/mjeshani2/iconikLearn/issues/new?template=bug_report.md)** • **[💡 Request Feature](https://github.com/mjeshani2/iconikLearn/issues/new?template=feature_request.md)**
+**[ Star us on GitHub](https://github.com/mjeshani2/iconikLearn)** • **[ Report Bug](https://github.com/mjeshani2/iconikLearn/issues/new?template=bug_report.md)** • **[ Request Feature](https://github.com/mjeshani2/iconikLearn/issues/new?template=feature_request.md)**
 
 *Making quality education accessible, engaging, and effective for learners worldwide.*
 
