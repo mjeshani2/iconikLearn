@@ -545,18 +545,6 @@ git push origin feature/your-educational-feature
 # Create pull request through GitHub interface
 ```
 
-### Community Guidelines
-
-**Communication Channels**
-- **GitHub Issues**: Bug reports, feature requests, and technical discussions
-- **GitHub Discussions**: Educational questions, pedagogical ideas, and community discussions
-- **Security Issues**: Private disclosure through security@iconiklearn.com
-
-**Recognition System**
-- Contributors are recognized in release notes and educational community showcases
-- Significant educational contributions may be highlighted in educator newsletters
-- Regular contributors may be invited to join the educational advisory board
-
 ## Deployment & Production
 
 ### Production Deployment Options
