@@ -148,106 +148,189 @@ Background Installation → User Notification
 
 ## 3. Technology Stack
 
-### Frontend Technologies
+### Frontend Technologies (Progressive Web App)
 
 #### Core Web Technologies
-- **HTML5**: Semantic markup with accessibility attributes and offline capabilities
-- **CSS3**: Modern styling with CSS Grid, Flexbox, and CSS Custom Properties
-- **JavaScript (ES2020+)**: Modern JavaScript with async/await, modules, and Web APIs
-- **TypeScript**: Type-safe development for improved code quality and maintainability
-
-#### Framework and Libraries
-- **React 18**: Component-based UI with concurrent features and Suspense
-- **React Router**: Client-side routing with code splitting and lazy loading
-- **Zustand**: Lightweight state management with persistence support
-- **Framer Motion**: Smooth animations optimized for mobile devices
+- **HTML5** - Semantic markup with offline media support, canvas games, and audio/video capabilities
+- **CSS3** - Responsive UI design with lightweight animations and modern layout techniques
+- **JavaScript (ES6+)** - Modern vanilla JavaScript with offline-first patterns and PWA capabilities
 
 #### PWA Technologies
-- **Service Workers**: Background processing, caching, and offline functionality
-- **Web App Manifest**: Native app-like installation and behavior
-- **Workbox**: Google's PWA toolkit for advanced caching strategies
-- **IndexedDB**: Client-side database for structured data storage
+- **Service Workers** - Offline caching strategies and background synchronization
+- **Web App Manifest** - Installable app experience without app store dependency
+- **IndexedDB** - Client-side structured data storage for offline functionality
+- **Cache API** - Static asset caching for games, images, and educational media
 
-#### Game Development
-- **Canvas API**: 2D graphics rendering with hardware acceleration
-- **Web Audio API**: Immersive audio experiences and sound effects
-- **WebGL**: 3D graphics for advanced visualizations (optional enhancement)
-- **PixiJS**: High-performance 2D graphics library for complex games
+**Vanilla JavaScript PWA Architecture Benefits:**
+- Smaller bundle size and faster performance than framework-based solutions
+- Works as both web and installable mobile app
+- Runs efficiently on low-cost Android phones and laptops
+- Supports complete offline functionality
+- No Play Store dependency, minimal hardware requirements
+- Direct DOM manipulation for optimal performance on low-end devices
 
-### Backend Technologies (Lightweight)
+### Game Development & Gamification Technologies
+
+#### Educational Game Engine
+- **Phaser.js** - 2D educational games engine (best choice for interactive learning content)
+- **CreateJS** - Animations and interactive educational experiences
+- **HTML5 Canvas/SVG** - Custom graphics rendering and educational visualizations
+
+#### Gamification Framework
+```javascript
+// Custom gamification engine structure
+class EducationalGamificationEngine {
+  constructor(config) {
+    this.xpSystem = new ExperiencePointsSystem(config.xp);
+    this.achievementSystem = new AchievementSystem(config.achievements);
+    this.leaderboardSystem = new LeaderboardSystem(config.leaderboards);
+    this.streakSystem = new StreakSystem(config.streaks);
+  }
+  
+  // Event-driven architecture for learning activities
+  onLearningEvent(event) {
+    this.xpSystem.processLearningActivity(event);
+    this.achievementSystem.checkEducationalMilestones(event);
+    this.leaderboardSystem.updateClassRankings(event);
+    this.streakSystem.maintainLearningStreaks(event);
+  }
+}
+```
+
+#### Gamification Components
+- **XP System** - Experience points, levels, badges, and learning streaks
+- **Leaderboards** - Local classroom competition with online synchronization
+- **Achievement Engine** - Custom JavaScript module for educational milestone tracking
+- **Progress Tracking** - Real-time learning analytics and skill mastery indicators
+
+### Backend Technologies (Lightweight & Scalable)
 
 #### API Services
-- **Node.js**: JavaScript runtime for consistent full-stack development
-- **Express.js**: Minimal web framework for API endpoints
-- **GraphQL**: Efficient data fetching with client-specified queries
-- **JWT**: Stateless authentication for scalable user management
+- **Node.js + Express.js** - Lightweight RESTful API services optimized for educational data
+- **RESTful APIs** - Simple, cacheable endpoints for educational content and progress sync
+- **JWT Authentication** - Secure, stateless token-based authentication system
 
-#### Database and Storage
-- **PostgreSQL**: Relational database for structured data and analytics
-- **Redis**: In-memory caching for session management and real-time features
-- **AWS S3/CloudFront**: Content delivery network for global asset distribution
-- **MongoDB**: Document storage for flexible content management (optional)
+#### Authentication Strategy
+- **Phone number/School ID login** - Simple authentication suitable for educational environments
+- **JWT tokens** - Secure session management with offline capability
+- **Optional OTP** - SMS/email verification via gateway services for enhanced security
 
-#### Infrastructure
-- **Docker**: Containerized deployment for consistent environments
-- **Kubernetes**: Container orchestration for scalable cloud deployment
-- **GitHub Actions**: Continuous integration and deployment pipelines
-- **Terraform**: Infrastructure as code for reproducible deployments
+**Lightweight Backend Rationale:** Most learning activities operate offline; backend primarily handles progress synchronization, teacher analytics, and content distribution.
+
+### Database Solutions
+
+#### Primary Database
+- **PostgreSQL** - Robust relational database for analytics and user management (recommended)
+- **MySQL** - Alternative lightweight option for smaller educational deployments
+
+#### Offline Sync Optimization (Optional)
+- **CouchDB + PouchDB** - Excellent offline-first synchronization capabilities
+- **Automatic conflict resolution** - Seamless data merging across multiple devices
+- **Bidirectional sync** - Efficient data flow between client and server
 
 ### Storage Technologies
 
 #### Client-Side Storage Strategy
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                 Storage Architecture                    │
+│                 Offline-First Storage                   │
 ├─────────────────────────────────────────────────────────┤
 │  IndexedDB (Primary)     │  Cache API (Assets)         │
-│  - User Progress         │  - Images, Videos           │
-│  - Game States          │  - Audio Files              │
-│  - Learning Analytics   │  - Static Resources         │
-│  - Offline Content     │  - App Shell                │
+│  - Lessons & Games       │  - Educational Images       │
+│  - Progress Tracking     │  - Audio/Video Content      │
+│  - Assessment Scores     │  - Game Assets              │
+│  - Learning Analytics    │  - App Shell Resources      │
 ├─────────────────────────────────────────────────────────┤
 │  LocalStorage (Config)   │  SessionStorage (Temp)      │
-│  - User Preferences     │  - Current Session          │
-│  - Language Settings    │  - Temporary Game State     │
-│  - Theme Configuration  │  - Form Data                │
+│  - Language Preferences  │  - Current Game State       │
+│  - UI Settings          │  - Temporary Progress        │
+│  - Offline Mode Config  │  - Session Data             │
 └─────────────────────────────────────────────────────────┘
 ```
 
-#### Storage Optimization
-- **Compression**: LZ4 compression for text content and JSON data
-- **Deduplication**: Shared assets across multiple learning modules
-- **Lazy Loading**: On-demand loading of non-critical content
-- **Garbage Collection**: Automatic cleanup of unused cached content
+#### Offline Synchronization Strategy
+- **Offline-first design** - All core learning functionality operates without internet
+- **Background sync** - Intelligent data synchronization when connectivity becomes available
+- **Service Worker sync** - Automated conflict resolution and data merging
+- **Progressive enhancement** - Online features enhance but don't replace offline capabilities
 
-### Analytics Tools
+### Analytics & Dashboard Technologies
+
+#### Teacher Dashboard Technology
+- **Vanilla JavaScript (ES6+)** - Interactive teacher dashboard with DOM manipulation and modern JavaScript features
+- **Chart.js/Recharts** - Educational data visualization and progress tracking charts
+
+#### Educational Analytics Tracking
+- **Time spent per subject** - Detailed learning engagement analysis
+- **Completion rates** - Assignment and lesson completion tracking
+- **Accuracy scores** - Assessment performance monitoring and trends
+- **Engagement patterns** - Student participation and motivation metrics
+- **Connectivity analysis** - Offline vs online usage patterns for infrastructure planning
 
 #### Privacy-First Analytics
-- **Local Analytics Engine**: Client-side processing to minimize data transmission
-- **Differential Privacy**: Mathematical privacy guarantees for aggregated data
-- **Consent Management**: GDPR/COPPA compliant data collection workflows
-- **Data Minimization**: Collection limited to educationally relevant metrics
+- **Local Analytics Engine** - Client-side processing to minimize data transmission
+- **Minimal data collection** - Privacy-by-design principles for student protection
+- **Consent Management** - COPPA/GDPR compliant data collection workflows
+- **Data Minimization** - Collection limited to educationally relevant metrics
 
-#### Reporting and Visualization
-- **Chart.js**: Lightweight charting library for progress visualization
-- **D3.js**: Advanced data visualization for complex analytics dashboards
-- **React Query**: Efficient data fetching and caching for real-time updates
-- **Export Libraries**: PDF generation and CSV export for offline reporting
+### Internationalization Technologies
 
-### Open-Source Gamification Framework
+#### Multilingual Framework
+- **i18next** - Vanilla JavaScript compatible internationalization library with educational focus
+- **JSON-based language files** - Structured translation management for educational content
 
-#### Selected Framework: **Gamify.js** (Custom Implementation)
-```javascript
-// Core gamification engine structure
-class GamificationEngine {
-  constructor(config) {
-    this.pointsSystem = new PointsSystem(config.points);
-    this.achievementSystem = new AchievementSystem(config.achievements);
-    this.progressSystem = new ProgressSystem(config.progression);
-    this.leaderboardSystem = new LeaderboardSystem(config.leaderboards);
-  }
-  
-  // Event-driven architecture for learning activities
+#### Content Localization Strategy
+- **Downloadable language packs** - Offline multilingual support for diverse regions
+- **Regional curriculum mapping** - Alignment with local educational standards and requirements
+- **Cultural adaptation** - Region-specific educational examples and cultural references
+
+### Deployment & Infrastructure
+
+#### Low-Cost Deployment Options
+
+**Frontend (PWA) Hosting**
+- **Netlify** - Free tier with global CDN, automatic deployments, and PWA optimization
+- **Vercel** - Vanilla JavaScript optimized hosting with edge functions and global distribution
+
+**Backend Services**
+- **Render** - Simple backend hosting with integrated PostgreSQL support
+- **Railway** - Developer-friendly platform with seamless database integration
+- **Fly.io** - Global application deployment with edge computing capabilities
+
+**Content Delivery Network**
+- **Cloudflare** - Free tier CDN for global educational asset delivery and performance optimization
+
+### Security & Privacy Technologies
+
+#### Data Protection Framework
+- **HTTPS everywhere** - Secure data transmission across all educational interactions
+- **Minimal personal data collection** - Privacy-by-design principles for student protection
+- **Encrypted JWT tokens** - Secure authentication and session management
+- **Role-based access control** - Granular permissions for Students, Teachers, and Administrators
+- **COPPA/GDPR compliance** - Child safety and privacy protection best practices
+
+#### Educational Data Security
+- **Local data encryption** - Client-side encryption for sensitive educational records
+- **Audit trails** - Comprehensive logging for educational data access and modifications
+- **Data retention policies** - Automatic cleanup of unnecessary student information
+- **Parental consent management** - Age-appropriate data collection workflows
+
+### Future Enhancement Technologies
+
+#### AI-Powered Adaptive Learning
+- **TensorFlow.js** - On-device machine learning for personalized educational experiences
+- **Client-side processing** - Privacy-preserving personalization algorithms
+- **Adaptive difficulty** - Real-time learning path optimization
+
+#### Advanced Interaction Capabilities
+- **Web Speech API** - Voice-based learning and enhanced accessibility features
+- **Push API (PWA)** - Educational notifications and learning reminders
+- **Geolocation API** - Location-based educational content and field trip integration
+
+#### Extreme Connectivity Solutions
+- **SMS-based synchronization** - Data sync via SMS for areas with extremely limited internet
+- **Peer-to-peer sharing** - Local network content distribution between student devices
+- **Bluetooth content sharing** - Device-to-device educational resource sharing
   onLearningEvent(event) {
     this.pointsSystem.processEvent(event);
     this.achievementSystem.checkAchievements(event);
