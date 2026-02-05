@@ -146,7 +146,7 @@ npm run db:setup
 npm run dev:watch
 ```
 
-## 📱 Device Support
+## Device Support
 
 ### Minimum Requirements
 - **Android**: 6.0+ with 2GB RAM
