@@ -915,19 +915,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## Contact & Support
-
-- **Website**: https://ecoplatform.in
-- **Email**: support@ecoplatform.in
-- **Documentation**: https://docs.ecoplatform.in
-- **Community Forum**: https://community.ecoplatform.in
-- **Twitter**: @EcoPlatformIN
-- **LinkedIn**: IconikStudio
-
-For enterprise inquiries: enterprise@ecoplatform.in
-
----
-
 <div align="center">
 
 ### Built with Excellence by IconikStudio

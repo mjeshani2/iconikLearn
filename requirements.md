@@ -702,17 +702,14 @@ To create India's leading environmental education platform that transforms every
 
 ### Assumptions
 
-1. **Infrastructure**: 70% of target institutions have basic internet connectivity (even if intermittent)
-2. **Devices**: 60% of students have access to smartphones or shared devices; platform works on low-cost Android phones
+1. **Infrastructure**: 70% of target institutions have basic internet connectivity and computer labs
+2. **Devices**: 60% of students have access to smartphones (personal or shared)
 3. **Digital Literacy**: Teachers have basic computer skills and can be trained on the platform
 4. **Institutional Support**: School/college administration supports environmental education initiatives
 5. **Parental Consent**: Parents are willing to provide consent for student participation
 6. **Content Accuracy**: NGO and expert partners provide verified environmental content
-7. **Funding**: Initial funding available for 1-year development and pilot deployment (reduced costs with free hosting)
+7. **Funding**: Initial funding available for 2-year development and pilot deployment
 8. **Regulatory Compliance**: Platform meets current Indian data protection regulations
-9. **Browser Support**: Students use modern browsers (Chrome, Firefox, Edge, Safari) that support PWA features
-10. **Offline Usage**: Students can download content when connected and use offline for extended periods
-11. **Free Hosting**: Free tiers of Netlify/Vercel/Render sufficient for pilot phase (100-1000 schools)
 
 ### Constraints
 
@@ -845,8 +842,3 @@ To create India's leading environmental education platform that transforms every
 - **Cultural Sensitivity**: Respect for diverse backgrounds and beliefs
 - **Misinformation Prevention**: Fact-checking and expert validation
 
----
-
-*Document Version: 1.0*  
-*Last Updated: February 2026*  
-*Classification: Internal - Product Development*
