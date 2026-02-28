@@ -5,6 +5,27 @@
 
 ## High-Level System Architecture
 
+### Architecture Deployment Modes
+
+This platform supports two officially supported deployment modes:
+
+#### Mode A: Lightweight Institutional Deployment (Default)
+- Single Node.js backend
+- PostgreSQL
+- Vanilla JS PWA (offline-first)
+- Designed for schools, colleges, NGOs, rural connectivity
+- Minimal infrastructure cost
+- Most learning & gameplay runs offline
+
+#### Mode B: Enterprise / Government Deployment
+- Microservices architecture
+- Kafka + Redis + Kubernetes
+- Horizontal scaling across regions
+- Used for state / national-level rollouts
+- Advanced analytics & reporting
+
+Both modes share the same core domain logic and APIs.
+
 ### Architecture Overview
 
 The platform follows a cloud-native, microservices-based architecture with offline-first capabilities. The system is designed for horizontal scalability, high availability, and resilience.
