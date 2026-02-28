@@ -1,1274 +1,1984 @@
-# iconikLearn - Design Document
-## Gamified Digital Learning Platform for Low-Connectivity Environments
+# Enterprise System & Architecture Design
+## Gamified Environmental Education Platform
 
 ---
 
-## 1. Design Overview
+## High-Level System Architecture
 
-### Design Goals
+### Architecture Overview
 
-The iconikLearn platform is designed to deliver engaging, gamified educational experiences that work seamlessly in low-connectivity environments while supporting diverse learning needs across all grade levels and subjects.
+The platform follows a cloud-native, microservices-based architecture with offline-first capabilities. The system is designed for horizontal scalability, high availability, and resilience.
 
-**Primary Design Goals:**
-- **Offline-First Experience**: Ensure 100% functionality without internet connectivity
-- **Inclusive Access**: Support low-cost devices and diverse user capabilities
-- **Engaging Learning**: Increase student engagement by 15% through gamification
-- **Scalable Architecture**: Support growth from hundreds to millions of users
-- **Cultural Adaptability**: Serve diverse global communities with multilingual support
+**Architecture Layers**:
 
-### Key Design Principles
+1. **Presentation Layer**: Progressive Web App (PWA), Native Mobile Apps (optional)
+2. **API Gateway Layer**: Request routing, authentication, rate limiting, caching
+3. **Application Layer**: Microservices for core business logic
+4. **Data Layer**: Distributed databases, caching, message queues
+5. **Integration Layer**: Third-party services, external APIs, webhooks
+6. **Analytics Layer**: Data warehouse, real-time analytics, reporting
+7. **Infrastructure Layer**: Cloud services, CDN, monitoring, security
 
-#### 1. Offline-First Architecture
-- **Local-First Data**: All critical functionality operates without internet dependency
-- **Smart Synchronization**: Efficient data sync when connectivity is available
-- **Progressive Enhancement**: Online features enhance but don't replace offline capabilities
-- **Resilient Design**: Graceful degradation during connectivity issues
+### System Components
 
-#### 2. Inclusive Design
-- **Universal Accessibility**: WCAG 2.1 AA compliance for students with disabilities
-- **Device Agnostic**: Optimized for devices from basic smartphones to tablets
-- **Low Resource Usage**: Minimal RAM, storage, and processing requirements
-- **Multilingual Support**: Native support for 20+ languages and RTL text
+**Client Applications**:
+- Progressive Web App (React/Next.js)
+- Android App (React Native - optional phase 2)
+- iOS App (React Native - optional phase 2)
+- Admin Dashboard (React/Next.js)
+- Teacher Portal (React/Next.js)
 
-#### 3. Engaging User Experience
-- **Age-Appropriate Design**: Tailored interfaces for different developmental stages
-- **Gamification Integration**: Seamless integration of game mechanics with learning
-- **Immediate Feedback**: Real-time responses to student actions and progress
-- **Personalized Journeys**: Adaptive content based on individual learning patterns
+**Backend Services**:
+- User Service (authentication, profiles, roles)
+- Challenge Service (tasks, submissions, verification)
+- Gamification Service (points, badges, levels, leaderboards)
+- Content Service (learning materials, resources)
+- Analytics Service (metrics, reports, insights)
+- Notification Service (push, email, SMS)
+- Media Service (image/video upload, processing, storage)
+- Integration Service (external APIs, webhooks)
 
-#### 4. Scalable Foundation
-- **Modular Architecture**: Independent, composable system components
-- **Performance Optimization**: Sub-3-second load times on low-end devices
-- **Content Scalability**: Support for 100,000+ learning activities
-- **Global Distribution**: Multi-region deployment capabilities
+**Data Stores**:
+- PostgreSQL (relational data: users, institutions, challenges)
+- MongoDB (document data: submissions, content, logs)
+- Redis (caching, sessions, real-time leaderboards)
+- Elasticsearch (search, analytics, logging)
+- S3-compatible storage (media files, backups)
 
----
+**Infrastructure Services**:
+- API Gateway (Kong/AWS API Gateway)
+- Message Queue (RabbitMQ/AWS SQS)
+- CDN (CloudFront/Cloudflare)
+- Load Balancer (AWS ALB/Nginx)
+- Container Orchestration (Kubernetes/ECS)
 
-## 2. System Architecture
 
-### High-Level Architecture Overview
+### Network Architecture
 
-The iconikLearn platform follows a **Progressive Web App (PWA) architecture** with an **offline-first design pattern**. The system consists of three primary layers:
-
-**Client Layer (PWA)**
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Client Application                    │
-├─────────────────────────────────────────────────────────┤
-│  UI Components  │  Game Engine  │  Analytics Engine    │
-│  - React/Vue    │  - Canvas API │  - Local Tracking   │
-│  - CSS Modules  │  - WebGL      │  - Privacy-First    │
-│  - Responsive   │  - Audio API  │  - Offline Storage  │
-├─────────────────────────────────────────────────────────┤
-│              Service Worker Layer                       │
-│  - Offline Caching  │  Background Sync  │  Push Notif. │
-├─────────────────────────────────────────────────────────┤
-│                 Local Storage Layer                     │
-│  IndexedDB  │  Cache API  │  LocalStorage  │  WebSQL   │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Synchronization Layer**
-```
-┌─────────────────────────────────────────────────────────┐
-│                 Sync Management                         │
-├─────────────────────────────────────────────────────────┤
-│  Conflict Resolution  │  Priority Queue  │  Retry Logic │
-│  - CRDT Algorithms   │  - Smart Batching │  - Exp. Backoff │
-│  - Merge Strategies  │  - Bandwidth Aware│  - Error Handling│
-└─────────────────────────────────────────────────────────┘
-```
-
-**Backend Services (Lightweight)**
-```
-┌─────────────────────────────────────────────────────────┐
-│                  Backend Services                       │
-├─────────────────────────────────────────────────────────┤
-│  Content API  │  Analytics API  │  User Management     │
-│  - CDN Delivery│  - Aggregation  │  - Authentication   │
-│  - Versioning │  - Privacy-Safe │  - Role Management  │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Client-Side Components
-
-#### Core Application Shell
-- **App Shell**: Minimal HTML, CSS, and JavaScript for instant loading
-- **Router**: Client-side routing for seamless navigation
-- **State Management**: Centralized state with offline persistence
-- **Component Library**: Reusable UI components optimized for performance
-
-#### Game Engine
-- **Canvas Renderer**: Hardware-accelerated 2D graphics using Canvas API
-- **Audio System**: Web Audio API for immersive sound experiences
-- **Input Handler**: Touch, mouse, and keyboard input management
-- **Animation Engine**: Smooth 60fps animations with fallback optimization
-
-#### Learning Management System
-- **Progress Tracker**: Local storage of learning analytics and achievements
-- **Content Manager**: Intelligent caching and retrieval of educational content
-- **Assessment Engine**: Offline quiz and evaluation system
-- **Adaptive Logic**: Difficulty adjustment based on performance patterns
-
-### Backend Services (Minimal Dependency)
-
-#### Content Delivery Network
-- **Static Asset Delivery**: Images, videos, audio files via global CDN
-- **Content Versioning**: Efficient updates with delta synchronization
-- **Compression**: Optimized file formats for bandwidth efficiency
-- **Regional Caching**: Geographically distributed content servers
-
-#### Analytics Aggregation Service
-- **Privacy-First Analytics**: Anonymized data collection and processing
-- **Real-Time Dashboards**: Teacher and administrator reporting interfaces
-- **Batch Processing**: Efficient handling of large-scale usage data
-- **Export APIs**: Integration with school information systems
-
-### Data Flow Architecture
-
-#### Offline Operation Flow
-```
-Student Interaction → Local Game Engine → IndexedDB Storage → 
-Progress Tracking → Achievement System → UI Updates
-```
-
-#### Online Synchronization Flow
-```
-Background Sync Trigger → Conflict Detection → Data Merge → 
-Server Upload → Confirmation → Local State Update
-```
-
-#### Content Update Flow
-```
-Content Version Check → Delta Download → Local Cache Update → 
-Background Installation → User Notification
+┌─────────────────────────────────────────────────────────────┐
+│                     Client Layer (PWA/Apps)                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ Student  │  │ Teacher  │  │  Admin   │  │   NGO    │   │
+│  │   App    │  │  Portal  │  │Dashboard │  │  Portal  │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            ↓ HTTPS
+┌─────────────────────────────────────────────────────────────┐
+│                    CDN + Edge Caching                        │
+│              (CloudFront / Cloudflare)                       │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   Load Balancer (ALB)                        │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    API Gateway (Kong)                        │
+│  Authentication │ Rate Limiting │ Caching │ Routing         │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  Microservices Layer                         │
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐   │
+│  │User  │ │Chall │ │Gamif │ │Cont  │ │Analy │ │Notif │   │
+│  │Svc   │ │enge  │ │ication│ │ent   │ │tics  │ │ication│  │
+│  └──────┘ └──────┘ └──────┘ └──────┘ └──────┘ └──────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      Data Layer                              │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │PostgreSQL│  │ MongoDB  │  │  Redis   │  │Elastic   │   │
+│  │(Primary) │  │(Documents│  │ (Cache)  │  │search    │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Technology Stack
+## Component-Level Design
 
-### Frontend Technologies (Progressive Web App)
+### User Service
 
-#### Core Web Technologies
-- **HTML5** - Semantic markup with offline media support, canvas games, and audio/video capabilities
-- **CSS3** - Responsive UI design with lightweight animations and modern layout techniques
-- **JavaScript (ES6+)** - Modern vanilla JavaScript with offline-first patterns and PWA capabilities
+**Responsibilities**:
+- User registration and authentication
+- Profile management
+- Role-based access control
+- Session management
+- Password reset and security
 
-#### PWA Technologies
-- **Service Workers** - Offline caching strategies and background synchronization
-- **Web App Manifest** - Installable app experience without app store dependency
-- **IndexedDB** - Client-side structured data storage for offline functionality
-- **Cache API** - Static asset caching for games, images, and educational media
+**Key APIs**:
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/refresh` - Token refresh
+- `GET /api/v1/users/{id}` - Get user profile
+- `PUT /api/v1/users/{id}` - Update profile
+- `GET /api/v1/users/{id}/achievements` - Get user achievements
 
-**Vanilla JavaScript PWA Architecture Benefits:**
-- Smaller bundle size and faster performance than framework-based solutions
-- Works as both web and installable mobile app
-- Runs efficiently on low-cost Android phones and laptops
-- Supports complete offline functionality
-- No Play Store dependency, minimal hardware requirements
-- Direct DOM manipulation for optimal performance on low-end devices
+**Database Schema**:
+- users (id, email, phone, password_hash, role, institution_id, created_at)
+- profiles (user_id, name, grade, section, avatar, preferences)
+- sessions (id, user_id, token, expires_at)
+- roles (id, name, permissions)
 
-### Game Development & Gamification Technologies
+**Technology**:
+- Node.js with Express/Fastify
+- JWT for authentication
+- bcrypt for password hashing
+- PostgreSQL for user data
 
-#### Educational Game Engine
-- **Phaser.js** - 2D educational games engine (best choice for interactive learning content)
-- **CreateJS** - Animations and interactive educational experiences
-- **HTML5 Canvas/SVG** - Custom graphics rendering and educational visualizations
 
-#### Gamification Framework
+### Challenge Service
+
+**Responsibilities**:
+- Challenge creation and management
+- Task assignment and tracking
+- Submission handling
+- Verification workflow
+- Challenge categories and difficulty levels
+
+**Key APIs**:
+- `GET /api/v1/challenges` - List challenges (with filters)
+- `GET /api/v1/challenges/{id}` - Get challenge details
+- `POST /api/v1/challenges` - Create challenge (teacher/admin)
+- `POST /api/v1/challenges/{id}/accept` - Accept challenge
+- `POST /api/v1/challenges/{id}/submit` - Submit completion proof
+- `GET /api/v1/submissions/{id}` - Get submission details
+- `PUT /api/v1/submissions/{id}/verify` - Verify submission
+
+**Database Schema**:
+- challenges (id, title, description, category, difficulty, points, created_by)
+- challenge_assignments (id, challenge_id, user_id, status, accepted_at)
+- submissions (id, assignment_id, evidence_type, evidence_url, submitted_at)
+- verifications (id, submission_id, verifier_id, status, feedback, verified_at)
+
+**Technology**:
+- Node.js with Express
+- MongoDB for flexible challenge data
+- S3 for evidence storage
+- Message queue for async verification
+
+### Gamification Service
+
+**Responsibilities**:
+- Points calculation and management
+- Badge and achievement system
+- Level progression
+- Leaderboard generation and updates
+- Streak tracking
+- Reward management
+
+**Key APIs**:
+- `GET /api/v1/gamification/dashboard` - User gamification dashboard
+- `GET /api/v1/gamification/leaderboard` - Get leaderboard (with filters)
+- `POST /api/v1/gamification/points` - Award points
+- `GET /api/v1/gamification/badges` - Get user badges
+- `GET /api/v1/gamification/level` - Get user level info
+- `POST /api/v1/gamification/rewards/redeem` - Redeem reward
+
+**Database Schema**:
+- user_points (user_id, total_points, level, level_progress)
+- point_transactions (id, user_id, points, reason, challenge_id, created_at)
+- badges (id, name, description, icon, criteria)
+- user_badges (user_id, badge_id, earned_at)
+- leaderboards (id, type, period, rankings_json, updated_at)
+- streaks (user_id, current_streak, longest_streak, last_activity_date)
+- rewards (id, name, cost, type, inventory)
+- redemptions (id, user_id, reward_id, status, redeemed_at)
+
+**Technology**:
+- Node.js with Express
+- Redis for real-time leaderboards
+- PostgreSQL for transactional data
+- Cron jobs for leaderboard updates
+
+
+### Content Service
+
+**Responsibilities**:
+- Learning content management
+- Quiz and assessment delivery
+- Resource library
+- Multi-language content
+- Content versioning
+
+**Key APIs**:
+- `GET /api/v1/content/lessons` - List lessons
+- `GET /api/v1/content/lessons/{id}` - Get lesson details
+- `GET /api/v1/content/quizzes/{id}` - Get quiz
+- `POST /api/v1/content/quizzes/{id}/submit` - Submit quiz answers
+- `GET /api/v1/content/resources` - List resources
+- `GET /api/v1/content/search` - Search content
+
+**Database Schema**:
+- lessons (id, title, content, category, language, difficulty, created_at)
+- quizzes (id, lesson_id, questions_json, passing_score)
+- quiz_attempts (id, user_id, quiz_id, score, answers_json, completed_at)
+- resources (id, title, type, url, category, language)
+- content_progress (user_id, content_id, progress_percent, last_accessed)
+
+**Technology**:
+- Node.js with Express
+- MongoDB for flexible content structure
+- Elasticsearch for content search
+- CDN for media delivery
+
+### Analytics Service
+
+**Responsibilities**:
+- Data aggregation and processing
+- Report generation
+- Real-time metrics
+- Impact calculations
+- Predictive analytics
+
+**Key APIs**:
+- `GET /api/v1/analytics/dashboard` - Get dashboard metrics
+- `GET /api/v1/analytics/student/{id}` - Student analytics
+- `GET /api/v1/analytics/class/{id}` - Class analytics
+- `GET /api/v1/analytics/institution/{id}` - Institution analytics
+- `GET /api/v1/analytics/impact` - Environmental impact metrics
+- `POST /api/v1/analytics/reports/generate` - Generate custom report
+
+**Database Schema**:
+- analytics_events (id, event_type, user_id, metadata_json, timestamp)
+- daily_metrics (date, user_id, challenges_completed, points_earned, time_spent)
+- impact_metrics (id, user_id, co2_saved, water_saved, waste_reduced, calculated_at)
+- reports (id, type, parameters_json, file_url, generated_at)
+
+**Technology**:
+- Python with FastAPI
+- Apache Kafka for event streaming
+- Apache Spark for data processing
+- PostgreSQL + TimescaleDB for time-series data
+- Elasticsearch for analytics queries
+
+
+### Notification Service
+
+**Responsibilities**:
+- Push notifications
+- Email notifications
+- SMS notifications (optional)
+- In-app notifications
+- Notification preferences
+- Delivery tracking
+
+**Key APIs**:
+- `POST /api/v1/notifications/send` - Send notification
+- `GET /api/v1/notifications` - Get user notifications
+- `PUT /api/v1/notifications/{id}/read` - Mark as read
+- `PUT /api/v1/notifications/preferences` - Update preferences
+- `POST /api/v1/notifications/subscribe` - Subscribe to push
+
+**Database Schema**:
+- notifications (id, user_id, type, title, message, read, created_at)
+- notification_preferences (user_id, push_enabled, email_enabled, categories)
+- push_subscriptions (user_id, endpoint, keys_json)
+- notification_logs (id, notification_id, status, delivered_at)
+
+**Technology**:
+- Node.js with Express
+- Firebase Cloud Messaging (FCM) for push
+- SendGrid/AWS SES for email
+- Redis for notification queue
+- MongoDB for notification storage
+
+### Media Service
+
+**Responsibilities**:
+- File upload handling
+- Image/video processing
+- Thumbnail generation
+- Content moderation
+- Storage management
+
+**Key APIs**:
+- `POST /api/v1/media/upload` - Upload file
+- `GET /api/v1/media/{id}` - Get media metadata
+- `DELETE /api/v1/media/{id}` - Delete media
+- `POST /api/v1/media/{id}/moderate` - Moderate content
+
+**Database Schema**:
+- media_files (id, user_id, type, url, size, moderation_status, uploaded_at)
+- thumbnails (media_id, size, url)
+
+**Technology**:
+- Node.js with Express
+- AWS S3/MinIO for storage
+- Sharp for image processing
+- FFmpeg for video processing
+- AWS Rekognition for content moderation
+
+---
+
+## User Flow Diagrams (Textual)
+
+### Student Challenge Completion Flow
+
+1. Student logs into PWA
+2. Views personalized dashboard with recommended challenges
+3. Browses challenge categories (Energy, Water, Waste, etc.)
+4. Selects a challenge and views details (description, points, difficulty)
+5. Accepts challenge (added to "My Challenges")
+6. Completes real-world eco-task
+7. Opens app and navigates to challenge
+8. Clicks "Submit Completion"
+9. Uploads evidence (photo/video)
+10. Adds description and details
+11. Submits for verification
+12. Receives confirmation notification
+13. Waits for teacher verification (receives notification when verified)
+14. Upon approval: Points added, badges unlocked, leaderboard updated
+15. Views updated dashboard with new level/achievements
+
+
+### Teacher Verification Flow
+
+1. Teacher logs into portal
+2. Views verification dashboard with pending submissions count
+3. Navigates to "Pending Verifications" queue
+4. Filters by class, challenge type, or date
+5. Selects a submission to review
+6. Views student details, challenge requirements, and submitted evidence
+7. Reviews photo/video evidence
+8. Checks AI verification suggestions (if available)
+9. Makes decision:
+   - Approve: Adds optional feedback, confirms approval
+   - Reject: Provides reason, suggests improvements
+   - Request More Info: Asks student for clarification
+10. Submits verification decision
+11. System updates student points/badges (if approved)
+12. Student receives notification
+13. Teacher moves to next submission in queue
+
+### Institution Onboarding Flow
+
+1. Admin receives invitation email/link
+2. Clicks link and lands on registration page
+3. Enters institution details (name, type, location, board)
+4. Uploads institution logo and documents
+5. Creates admin account (email, password)
+6. Verifies email address
+7. Completes institution profile setup
+8. Configures academic year and terms
+9. Adds teacher accounts (bulk upload CSV or individual)
+10. Teachers receive invitation emails
+11. Teachers complete profile setup
+12. Admin creates classes/sections
+13. Assigns teachers to classes
+14. Uploads student list (bulk CSV import)
+15. Students receive invitation codes/links
+16. Students register and join classes
+17. Admin reviews dashboard and starts first campaign
+
+---
+
+## Data Models
+
+### Core Entities
+
+**User Entity**:
+```
+User {
+  id: UUID (PK)
+  email: String (unique)
+  phone: String (unique, optional)
+  password_hash: String
+  role: Enum (student, teacher, admin, ngo, government)
+  institution_id: UUID (FK)
+  status: Enum (active, inactive, suspended)
+  email_verified: Boolean
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+```
+
+**Profile Entity**:
+```
+Profile {
+  user_id: UUID (PK, FK)
+  first_name: String
+  last_name: String
+  avatar_url: String
+  date_of_birth: Date
+  grade: String
+  section: String
+  gender: Enum (male, female, other, prefer_not_to_say)
+  language_preference: String
+  bio: Text
+  interests: Array<String>
+}
+```
+
+**Institution Entity**:
+```
+Institution {
+  id: UUID (PK)
+  name: String
+  type: Enum (school, college, university)
+  board: Enum (CBSE, ICSE, State, IB, etc.)
+  address: Text
+  city: String
+  state: String
+  pincode: String
+  contact_email: String
+  contact_phone: String
+  logo_url: String
+  status: Enum (active, inactive, trial)
+  subscription_tier: Enum (free, basic, premium, enterprise)
+  created_at: Timestamp
+}
+```
+
+
+**Challenge Entity**:
+```
+Challenge {
+  id: UUID (PK)
+  title: String
+  description: Text
+  category: Enum (energy, water, waste, biodiversity, transport, food)
+  difficulty: Enum (beginner, intermediate, advanced)
+  points: Integer
+  estimated_time: Integer (minutes)
+  instructions: Text
+  evidence_required: Enum (photo, video, text, location)
+  impact_metrics: JSON {co2_saved, water_saved, etc.}
+  created_by: UUID (FK to User)
+  institution_id: UUID (FK, nullable for global challenges)
+  status: Enum (draft, active, archived)
+  start_date: Timestamp
+  end_date: Timestamp
+  created_at: Timestamp
+}
+```
+
+**Submission Entity**:
+```
+Submission {
+  id: UUID (PK)
+  user_id: UUID (FK)
+  challenge_id: UUID (FK)
+  evidence_type: Enum (photo, video, text)
+  evidence_urls: Array<String>
+  description: Text
+  location: JSON {lat, lng, address}
+  submitted_at: Timestamp
+  verification_status: Enum (pending, approved, rejected, needs_info)
+  verified_by: UUID (FK to User, nullable)
+  verified_at: Timestamp
+  feedback: Text
+  ai_verification_score: Float (0-1)
+  fraud_flags: Array<String>
+}
+```
+
+**Gamification Entities**:
+```
+UserPoints {
+  user_id: UUID (PK, FK)
+  total_points: Integer
+  level: Integer
+  level_progress: Float (0-100)
+  eco_coins: Integer
+  current_streak: Integer
+  longest_streak: Integer
+  last_activity_date: Date
+  updated_at: Timestamp
+}
+
+Badge {
+  id: UUID (PK)
+  name: String
+  description: Text
+  icon_url: String
+  category: String
+  criteria: JSON
+  rarity: Enum (common, rare, epic, legendary)
+  points_value: Integer
+}
+
+UserBadge {
+  user_id: UUID (FK)
+  badge_id: UUID (FK)
+  earned_at: Timestamp
+  PRIMARY KEY (user_id, badge_id)
+}
+
+Leaderboard {
+  id: UUID (PK)
+  type: Enum (class, school, district, state, national)
+  scope_id: UUID (class_id, institution_id, etc.)
+  period: Enum (daily, weekly, monthly, semester, annual)
+  start_date: Date
+  end_date: Date
+  rankings: JSON Array [{user_id, rank, points, change}]
+  updated_at: Timestamp
+}
+```
+
+### Relationships
+
+- User → Profile (1:1)
+- User → Institution (N:1)
+- User → Submissions (1:N)
+- User → UserPoints (1:1)
+- User → UserBadges (1:N)
+- Challenge → Submissions (1:N)
+- Institution → Users (1:N)
+- Institution → Challenges (1:N)
+- Badge → UserBadges (1:N)
+
+---
+
+## Gamification Engine Design
+
+### Points Calculation Engine
+
+**Base Points Formula**:
+```
+base_points = challenge.points
+multiplier = 1.0
+
+// Streak multiplier
+if (user.current_streak >= 7):
+  multiplier += min(user.current_streak * 0.1, 0.5)
+
+// First-time bonus
+if (is_first_completion(user, challenge)):
+  multiplier += 0.25
+
+// Team challenge bonus
+if (challenge.is_team_challenge):
+  multiplier += 0.20
+
+// Quality bonus (based on verification score)
+if (submission.ai_verification_score > 0.8):
+  multiplier += 0.15
+
+final_points = base_points * multiplier
+```
+
+**Level Progression**:
+```
+Level thresholds (exponential growth):
+Level 1: 0 points
+Level 2: 100 points
+Level 3: 300 points
+Level 4: 600 points
+Level 5: 1000 points
+...
+Level N: (N-1)^2 * 100 points
+
+Current level = floor(sqrt(total_points / 100)) + 1
+Progress to next level = (total_points - current_level_threshold) / 
+                         (next_level_threshold - current_level_threshold) * 100
+```
+
+
+### Badge Award Engine
+
+**Badge Criteria Evaluation**:
 ```javascript
-// Custom gamification engine structure
-class EducationalGamificationEngine {
-  constructor(config) {
-    this.xpSystem = new ExperiencePointsSystem(config.xp);
-    this.achievementSystem = new AchievementSystem(config.achievements);
-    this.leaderboardSystem = new LeaderboardSystem(config.leaderboards);
-    this.streakSystem = new StreakSystem(config.streaks);
+// Example: Water Warrior Badge
+{
+  "badge_id": "water-warrior",
+  "criteria": {
+    "type": "category_completion",
+    "category": "water",
+    "min_challenges": 10,
+    "min_impact": {"water_saved": 1000} // liters
   }
+}
+
+// Evaluation logic
+function evaluateBadge(user, badge) {
+  const userStats = getUserCategoryStats(user.id, badge.criteria.category);
   
-  // Event-driven architecture for learning activities
-  onLearningEvent(event) {
-    this.xpSystem.processLearningActivity(event);
-    this.achievementSystem.checkEducationalMilestones(event);
-    this.leaderboardSystem.updateClassRankings(event);
-    this.streakSystem.maintainLearningStreaks(event);
+  if (userStats.completed_challenges >= badge.criteria.min_challenges &&
+      userStats.water_saved >= badge.criteria.min_impact.water_saved) {
+    awardBadge(user.id, badge.id);
+    sendNotification(user.id, "badge_earned", badge);
   }
 }
 ```
 
-#### Gamification Components
-- **XP System** - Experience points, levels, badges, and learning streaks
-- **Leaderboards** - Local classroom competition with online synchronization
-- **Achievement Engine** - Custom JavaScript module for educational milestone tracking
-- **Progress Tracking** - Real-time learning analytics and skill mastery indicators
+**Badge Types**:
+1. **Milestone Badges**: Triggered by specific achievements (100 challenges, 1000 points)
+2. **Category Badges**: Earned by completing challenges in specific categories
+3. **Streak Badges**: Awarded for maintaining activity streaks
+4. **Impact Badges**: Based on environmental impact metrics
+5. **Social Badges**: Earned through collaboration and community engagement
+6. **Event Badges**: Limited-time badges for special campaigns
 
-### Backend Technologies (Lightweight & Scalable)
+### Leaderboard Update Engine
 
-#### API Services
-- **Node.js + Express.js** - Lightweight RESTful API services optimized for educational data
-- **RESTful APIs** - Simple, cacheable endpoints for educational content and progress sync
-- **JWT Authentication** - Secure, stateless token-based authentication system
-
-#### Authentication Strategy
-- **Phone number/School ID login** - Simple authentication suitable for educational environments
-- **JWT tokens** - Secure session management with offline capability
-- **Optional OTP** - SMS/email verification via gateway services for enhanced security
-
-**Lightweight Backend Rationale:** Most learning activities operate offline; backend primarily handles progress synchronization, teacher analytics, and content distribution.
-
-### Database Solutions
-
-#### Primary Database
-- **PostgreSQL** - Robust relational database for analytics and user management (recommended)
-- **MySQL** - Alternative lightweight option for smaller educational deployments
-
-#### Offline Sync Optimization (Optional)
-- **CouchDB + PouchDB** - Excellent offline-first synchronization capabilities
-- **Automatic conflict resolution** - Seamless data merging across multiple devices
-- **Bidirectional sync** - Efficient data flow between client and server
-
-### Storage Technologies
-
-#### Client-Side Storage Strategy
+**Real-Time Leaderboard (Redis)**:
 ```
-┌─────────────────────────────────────────────────────────┐
-│                 Offline-First Storage                   │
-├─────────────────────────────────────────────────────────┤
-│  IndexedDB (Primary)     │  Cache API (Assets)         │
-│  - Lessons & Games       │  - Educational Images       │
-│  - Progress Tracking     │  - Audio/Video Content      │
-│  - Assessment Scores     │  - Game Assets              │
-│  - Learning Analytics    │  - App Shell Resources      │
-├─────────────────────────────────────────────────────────┤
-│  LocalStorage (Config)   │  SessionStorage (Temp)      │
-│  - Language Preferences  │  - Current Game State       │
-│  - UI Settings          │  - Temporary Progress        │
-│  - Offline Mode Config  │  - Session Data             │
-└─────────────────────────────────────────────────────────┘
+// Sorted set structure
+Key: leaderboard:{type}:{scope_id}:{period}
+Score: total_points
+Member: user_id
+
+// Update operation
+ZADD leaderboard:school:123:weekly user_456 1250
+
+// Get rankings
+ZREVRANGE leaderboard:school:123:weekly 0 99 WITHSCORES
+
+// Get user rank
+ZREVRANK leaderboard:school:123:weekly user_456
 ```
 
-#### Offline Synchronization Strategy
-- **Offline-first design** - All core learning functionality operates without internet
-- **Background sync** - Intelligent data synchronization when connectivity becomes available
-- **Service Worker sync** - Automated conflict resolution and data merging
-- **Progressive enhancement** - Online features enhance but don't replace offline capabilities
+**Leaderboard Update Workflow**:
+1. User earns points from verified submission
+2. Points added to user_points table (PostgreSQL)
+3. Event published to message queue
+4. Leaderboard service consumes event
+5. Updates Redis sorted sets for all applicable leaderboards
+6. Calculates rank changes
+7. Sends notifications for significant rank improvements
+8. Periodic snapshot to PostgreSQL for historical data
 
-### Analytics & Dashboard Technologies
-
-#### Teacher Dashboard Technology
-- **Vanilla JavaScript (ES6+)** - Interactive teacher dashboard with DOM manipulation and modern JavaScript features
-- **Chart.js/Recharts** - Educational data visualization and progress tracking charts
-
-#### Educational Analytics Tracking
-- **Time spent per subject** - Detailed learning engagement analysis
-- **Completion rates** - Assignment and lesson completion tracking
-- **Accuracy scores** - Assessment performance monitoring and trends
-- **Engagement patterns** - Student participation and motivation metrics
-- **Connectivity analysis** - Offline vs online usage patterns for infrastructure planning
-
-#### Privacy-First Analytics
-- **Local Analytics Engine** - Client-side processing to minimize data transmission
-- **Minimal data collection** - Privacy-by-design principles for student protection
-- **Consent Management** - COPPA/GDPR compliant data collection workflows
-- **Data Minimization** - Collection limited to educationally relevant metrics
-
-### Internationalization Technologies
-
-#### Multilingual Framework
-- **i18next** - Vanilla JavaScript compatible internationalization library with educational focus
-- **JSON-based language files** - Structured translation management for educational content
-
-#### Content Localization Strategy
-- **Downloadable language packs** - Offline multilingual support for diverse regions
-- **Regional curriculum mapping** - Alignment with local educational standards and requirements
-- **Cultural adaptation** - Region-specific educational examples and cultural references
-
-### Deployment & Infrastructure
-
-#### Low-Cost Deployment Options
-
-**Frontend (PWA) Hosting**
-- **Netlify** - Free tier with global CDN, automatic deployments, and PWA optimization
-- **Vercel** - Vanilla JavaScript optimized hosting with edge functions and global distribution
-
-**Backend Services**
-- **Render** - Simple backend hosting with integrated PostgreSQL support
-- **Railway** - Developer-friendly platform with seamless database integration
-- **Fly.io** - Global application deployment with edge computing capabilities
-
-**Content Delivery Network**
-- **Cloudflare** - Free tier CDN for global educational asset delivery and performance optimization
-
-### Security & Privacy Technologies
-
-#### Data Protection Framework
-- **HTTPS everywhere** - Secure data transmission across all educational interactions
-- **Minimal personal data collection** - Privacy-by-design principles for student protection
-- **Encrypted JWT tokens** - Secure authentication and session management
-- **Role-based access control** - Granular permissions for Students, Teachers, and Administrators
-- **COPPA/GDPR compliance** - Child safety and privacy protection best practices
-
-#### Educational Data Security
-- **Local data encryption** - Client-side encryption for sensitive educational records
-- **Audit trails** - Comprehensive logging for educational data access and modifications
-- **Data retention policies** - Automatic cleanup of unnecessary student information
-- **Parental consent management** - Age-appropriate data collection workflows
-
-### Future Enhancement Technologies
-
-#### AI-Powered Adaptive Learning
-- **TensorFlow.js** - On-device machine learning for personalized educational experiences
-- **Client-side processing** - Privacy-preserving personalization algorithms
-- **Adaptive difficulty** - Real-time learning path optimization
-
-#### Advanced Interaction Capabilities
-- **Web Speech API** - Voice-based learning and enhanced accessibility features
-- **Push API (PWA)** - Educational notifications and learning reminders
-- **Geolocation API** - Location-based educational content and field trip integration
-
-#### Extreme Connectivity Solutions
-- **SMS-based synchronization** - Data sync via SMS for areas with extremely limited internet
-- **Peer-to-peer sharing** - Local network content distribution between student devices
-- **Bluetooth content sharing** - Device-to-device educational resource sharing
-  onLearningEvent(event) {
-    this.pointsSystem.processEvent(event);
-    this.achievementSystem.checkAchievements(event);
-    this.progressSystem.updateProgress(event);
-    this.leaderboardSystem.updateRankings(event);
+**Fair Play Algorithm**:
+```
+// Detect suspicious patterns
+function detectAnomalies(user_id) {
+  const recentActivity = getRecentActivity(user_id, days=7);
+  
+  // Check for unusual submission rate
+  if (recentActivity.submissions_per_day > 20) {
+    flagForReview(user_id, "high_submission_rate");
+  }
+  
+  // Check for duplicate evidence
+  const duplicates = findDuplicateEvidence(user_id);
+  if (duplicates.length > 0) {
+    flagForReview(user_id, "duplicate_evidence");
+  }
+  
+  // Check for time-based patterns (bot-like behavior)
+  if (hasRegularIntervals(recentActivity.timestamps)) {
+    flagForReview(user_id, "bot_pattern");
   }
 }
 ```
 
-#### Framework Features
-- **Modular Design**: Independent systems for points, achievements, and progress
-- **Event-Driven**: Reactive system responding to learning activities
-- **Configurable Rules**: JSON-based configuration for different subjects and grades
-- **Privacy-Aware**: Local processing with optional anonymous aggregation
-- **Multilingual**: Internationalization support for all gamification elements
+---
+
+## Task Verification & Moderation Workflow
+
+### Multi-Layer Verification System
+
+**Layer 1: Automated Pre-Validation**
+```
+function preValidateSubmission(submission) {
+  checks = [];
+  
+  // File format validation
+  if (!isValidFileFormat(submission.evidence_urls)) {
+    return reject("Invalid file format");
+  }
+  
+  // File size check
+  if (getFileSize(submission.evidence_urls) > MAX_SIZE) {
+    return reject("File too large");
+  }
+  
+  // Duplicate detection
+  if (isDuplicateSubmission(submission)) {
+    return reject("Duplicate submission detected");
+  }
+  
+  // Timestamp validation
+  if (!isRecentTimestamp(submission.metadata.timestamp)) {
+    return flag("Old timestamp");
+  }
+  
+  return pass();
+}
+```
+
+**Layer 2: AI-Assisted Verification**
+```
+function aiVerification(submission, challenge) {
+  // Image recognition
+  const imageLabels = detectLabels(submission.evidence_urls[0]);
+  const relevanceScore = calculateRelevance(imageLabels, challenge.category);
+  
+  // Content moderation
+  const moderationResult = moderateContent(submission.evidence_urls);
+  if (moderationResult.inappropriate) {
+    return {status: "rejected", reason: "inappropriate_content"};
+  }
+  
+  // Authenticity check
+  const authenticityScore = detectManipulation(submission.evidence_urls[0]);
+  
+  // Location verification (if applicable)
+  if (challenge.requires_location) {
+    const locationValid = verifyLocation(submission.location, challenge.location_constraints);
+  }
+  
+  return {
+    score: (relevanceScore + authenticityScore) / 2,
+    confidence: calculateConfidence(),
+    suggestion: relevanceScore > 0.7 ? "approve" : "review"
+  };
+}
+```
+
+
+**Layer 3: Peer Review (Optional)**
+```
+function peerReviewWorkflow(submission) {
+  // Select random peers from same grade
+  const reviewers = selectRandomPeers(submission.user_id, count=3);
+  
+  // Send review requests
+  reviewers.forEach(reviewer => {
+    createReviewTask(reviewer.id, submission.id);
+    sendNotification(reviewer.id, "review_request");
+  });
+  
+  // Collect reviews
+  waitForReviews(submission.id, timeout=24_hours);
+  
+  // Calculate consensus
+  const reviews = getReviews(submission.id);
+  const approvalRate = reviews.filter(r => r.decision === "approve").length / reviews.length;
+  
+  if (approvalRate >= 0.67) {
+    return {status: "approved", method: "peer_consensus"};
+  } else if (approvalRate <= 0.33) {
+    return {status: "rejected", method: "peer_consensus"};
+  } else {
+    return {status: "needs_teacher_review", method: "peer_inconclusive"};
+  }
+}
+```
+
+**Layer 4: Teacher Verification**
+```
+function teacherVerificationQueue(teacher_id) {
+  // Prioritize submissions
+  const queue = getSubmissions({
+    status: "pending_teacher_review",
+    class_id: teacher.class_ids,
+    order_by: [
+      "ai_score DESC",  // High confidence first
+      "submitted_at ASC"  // Older submissions first
+    ]
+  });
+  
+  // Smart batching
+  const batches = groupSimilarSubmissions(queue);
+  
+  return batches;
+}
+
+function teacherDecision(submission_id, decision, feedback) {
+  updateSubmission(submission_id, {
+    verification_status: decision,
+    verified_by: teacher_id,
+    verified_at: now(),
+    feedback: feedback
+  });
+  
+  if (decision === "approved") {
+    awardPoints(submission.user_id, submission.challenge_id);
+    updateLeaderboards(submission.user_id);
+    checkBadgeEligibility(submission.user_id);
+  }
+  
+  sendNotification(submission.user_id, "verification_complete", {
+    status: decision,
+    feedback: feedback
+  });
+  
+  // Update teacher reputation
+  updateTeacherStats(teacher_id, decision);
+}
+```
+
+**Layer 5: Expert Validation (High-Value Tasks)**
+```
+function expertValidationRequired(submission, challenge) {
+  return challenge.points > 500 || 
+         challenge.category === "advanced" ||
+         submission.claimed_impact > threshold;
+}
+
+function routeToExpert(submission) {
+  const expert = findAvailableExpert(submission.challenge.category);
+  assignExpertReview(expert.id, submission.id);
+  sendNotification(expert.id, "expert_review_request");
+}
+```
+
+### Fraud Detection System
+
+**Pattern Analysis**:
+```
+function analyzeFraudPatterns(user_id) {
+  const patterns = {
+    submission_velocity: calculateSubmissionRate(user_id),
+    evidence_similarity: detectSimilarEvidence(user_id),
+    timing_patterns: analyzeSubmissionTiming(user_id),
+    location_consistency: checkLocationPatterns(user_id),
+    peer_comparison: compareWithPeers(user_id)
+  };
+  
+  const fraudScore = calculateFraudScore(patterns);
+  
+  if (fraudScore > 0.8) {
+    suspendAccount(user_id, "high_fraud_score");
+    notifyAdmin(user_id, fraudScore, patterns);
+  } else if (fraudScore > 0.5) {
+    flagForManualReview(user_id, patterns);
+  }
+  
+  return fraudScore;
+}
+```
 
 ---
 
-## 4. Offline-First Design
+## Security Architecture
 
-### Content Caching Strategy
+### Authentication & Authorization
 
-#### Intelligent Content Prioritization
+**JWT-Based Authentication**:
 ```
-┌─────────────────────────────────────────────────────────┐
-│                Content Priority Matrix                  │
-├─────────────────────────────────────────────────────────┤
-│  Priority 1 (Critical)   │  Priority 2 (Important)    │
-│  - Current Grade Content │  - Adjacent Grade Content   │
-│  - Active Assignments   │  - Remedial Materials       │
-│  - Core Curriculum     │  - Enrichment Activities    │
-├─────────────────────────────────────────────────────────┤
-│  Priority 3 (Optional)   │  Priority 4 (Future)       │
-│  - Seasonal Content     │  - Advanced Materials       │
-│  - Bonus Activities     │  - Next Semester Content    │
-│  - Social Features      │  - Experimental Features    │
-└─────────────────────────────────────────────────────────┘
+Access Token:
+- Lifetime: 15 minutes
+- Contains: user_id, role, institution_id
+- Signed with RS256
+
+Refresh Token:
+- Lifetime: 7 days
+- Stored in httpOnly cookie
+- Rotated on each use
+- Revocable via blacklist
 ```
 
-#### Caching Implementation
-- **Predictive Caching**: Machine learning-based prediction of content needs
-- **Adaptive Storage**: Dynamic allocation based on device storage capacity
-- **Background Downloads**: WiFi-only downloads during low-usage periods
-- **Content Expiration**: Automatic cleanup of outdated educational materials
+**Role-Based Access Control (RBAC)**:
+```
+Roles:
+- student: Read own data, submit challenges, view leaderboards
+- teacher: All student permissions + verify submissions, manage classes
+- admin: All teacher permissions + manage institution, view analytics
+- ngo: Create campaigns, view aggregated data
+- government: View regional analytics, generate reports
 
-### Offline Gameplay Behavior
+Permissions Matrix:
+Resource          | Student | Teacher | Admin | NGO | Government
+------------------|---------|---------|-------|-----|------------
+Own Profile       | RW      | RW      | RW    | RW  | R
+Other Profiles    | R       | R       | RW    | R   | R
+Challenges        | R       | RW      | RW    | RW  | R
+Submissions       | RW(own) | RW      | RW    | R   | R
+Analytics         | R(own)  | R(class)| R(all)| R   | R(region)
+```
 
-#### Game State Management
+
+### Data Security
+
+**Encryption**:
+- Data in transit: TLS 1.3
+- Data at rest: AES-256 encryption for sensitive fields
+- Database encryption: Transparent Data Encryption (TDE)
+- File storage: Server-side encryption (SSE-S3)
+
+**Sensitive Data Handling**:
+```
+Encrypted Fields:
+- user.password_hash (bcrypt with salt)
+- user.email (encrypted at rest)
+- user.phone (encrypted at rest)
+- profile.date_of_birth (encrypted at rest)
+
+PII Minimization:
+- Collect only necessary data
+- Anonymize data for analytics
+- Pseudonymize user IDs in logs
+- Automatic data retention policies
+```
+
+**API Security**:
+```
+Rate Limiting:
+- Anonymous: 10 requests/minute
+- Authenticated: 100 requests/minute
+- Admin: 1000 requests/minute
+
+Request Validation:
+- Input sanitization
+- SQL injection prevention
+- XSS protection
+- CSRF tokens for state-changing operations
+
+Security Headers:
+- Content-Security-Policy
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- Strict-Transport-Security
+```
+
+### Compliance & Privacy
+
+**Data Protection Compliance**:
+```
+DPDP Act 2023 (India):
+- Explicit consent for data collection
+- Right to access personal data
+- Right to correction
+- Right to erasure ("right to be forgotten")
+- Data portability
+- Breach notification within 72 hours
+
+FERPA-like Student Privacy:
+- Parental consent for users under 18
+- Limited data sharing with third parties
+- Educational purpose restrictions
+- Secure data storage and transmission
+```
+
+**Audit Logging**:
+```
+Logged Events:
+- User authentication (login, logout, failed attempts)
+- Data access (profile views, report generation)
+- Data modifications (profile updates, submissions)
+- Administrative actions (user management, configuration changes)
+- Security events (suspicious activity, access violations)
+
+Log Retention:
+- Security logs: 1 year
+- Audit logs: 3 years
+- Application logs: 90 days
+```
+
+---
+
+## Scalability Strategy
+
+### Horizontal Scaling
+
+**Stateless Services**:
+- All microservices designed to be stateless
+- Session data stored in Redis (shared state)
+- No local file storage (use S3)
+- Load balancer distributes traffic across instances
+
+**Auto-Scaling Configuration**:
+```
+Scaling Triggers:
+- CPU utilization > 70%: Scale up
+- Memory utilization > 80%: Scale up
+- Request queue depth > 100: Scale up
+- CPU utilization < 30% for 10 minutes: Scale down
+
+Scaling Limits:
+- Min instances: 2 (high availability)
+- Max instances: 50 (cost control)
+- Scale-up cooldown: 2 minutes
+- Scale-down cooldown: 10 minutes
+```
+
+### Database Scaling
+
+**PostgreSQL Scaling**:
+```
+Read Replicas:
+- 2 read replicas for read-heavy operations
+- Read/write splitting at application layer
+- Async replication with <1 second lag
+
+Partitioning:
+- submissions table: Partitioned by month
+- analytics_events table: Partitioned by week
+- Automatic partition creation and archival
+
+Connection Pooling:
+- PgBouncer for connection management
+- Pool size: 100 connections per instance
+- Transaction mode for short-lived connections
+```
+
+**MongoDB Scaling**:
+```
+Sharding Strategy:
+- Shard key: institution_id (data locality)
+- 3 shards initially, expandable to 10
+- Config servers: 3 replicas
+- Each shard: 3-node replica set
+
+Indexes:
+- Compound indexes for common queries
+- TTL indexes for temporary data
+- Text indexes for search functionality
+```
+
+**Redis Scaling**:
+```
+Redis Cluster:
+- 6 nodes (3 masters, 3 replicas)
+- Hash slot distribution
+- Automatic failover
+
+Use Cases:
+- Session storage (TTL: 7 days)
+- Leaderboard cache (sorted sets)
+- Rate limiting counters
+- Real-time notifications queue
+```
+
+
+### Caching Strategy
+
+**Multi-Layer Caching**:
+```
+Layer 1: CDN (CloudFront/Cloudflare)
+- Static assets: 1 year cache
+- Images/videos: 30 days cache
+- API responses (public): 5 minutes cache
+
+Layer 2: API Gateway Cache
+- GET endpoints: 1-5 minutes cache
+- Cache invalidation on data updates
+- User-specific cache keys
+
+Layer 3: Application Cache (Redis)
+- User profiles: 15 minutes
+- Challenge lists: 5 minutes
+- Leaderboards: 1 minute (real-time updates)
+- Content: 1 hour
+
+Layer 4: Database Query Cache
+- PostgreSQL query cache
+- MongoDB query result cache
+```
+
+**Cache Invalidation**:
+```
+Strategies:
+- Time-based expiration (TTL)
+- Event-based invalidation (on data updates)
+- Tag-based invalidation (related data groups)
+- Manual purge (admin action)
+
+Example:
+When user completes challenge:
+1. Invalidate user profile cache
+2. Invalidate user leaderboard entries
+3. Invalidate class leaderboard
+4. Invalidate school leaderboard
+5. Update Redis leaderboard sorted sets
+```
+
+### Message Queue Architecture
+
+**RabbitMQ/AWS SQS**:
+```
+Queues:
+1. verification-queue: Submission verification tasks
+2. notification-queue: Notification delivery
+3. analytics-queue: Analytics event processing
+4. email-queue: Email sending
+5. media-processing-queue: Image/video processing
+
+Dead Letter Queues:
+- Failed messages after 3 retries
+- Manual review and reprocessing
+- Alert on DLQ depth > 100
+
+Queue Configuration:
+- Message TTL: 24 hours
+- Max retries: 3
+- Retry delay: Exponential backoff (1m, 5m, 15m)
+```
+
+---
+
+## Offline-First Design Strategy
+
+### Progressive Web App (PWA) Architecture
+
+**Service Worker Strategy**:
 ```javascript
-// Offline game state architecture
-class OfflineGameManager {
-  constructor() {
-    this.localState = new IndexedDBStore('gameStates');
-    this.syncQueue = new SyncQueue();
-    this.conflictResolver = new ConflictResolver();
+// Cache-first strategy for static assets
+self.addEventListener('fetch', (event) => {
+  if (isStaticAsset(event.request)) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => response || fetch(event.request))
+    );
   }
-  
-  async saveGameProgress(gameId, progress) {
-    // Save locally with timestamp
-    await this.localState.save(gameId, {
-      ...progress,
-      timestamp: Date.now(),
-      synced: false
+});
+
+// Network-first with cache fallback for API calls
+if (isAPICall(event.request)) {
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        cache.put(event.request, response.clone());
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
+}
+```
+
+**Offline Data Sync**:
+```javascript
+// IndexedDB for offline storage
+const db = await openDB('eco-platform', 1, {
+  upgrade(db) {
+    db.createObjectStore('challenges');
+    db.createObjectStore('submissions');
+    db.createObjectStore('user-data');
+    db.createObjectStore('sync-queue');
+  }
+});
+
+// Queue offline submissions
+async function submitChallenge(data) {
+  if (navigator.onLine) {
+    return await api.post('/submissions', data);
+  } else {
+    await db.add('sync-queue', {
+      type: 'submission',
+      data: data,
+      timestamp: Date.now()
     });
-    
-    // Queue for sync when online
-    this.syncQueue.add({
-      type: 'gameProgress',
-      gameId,
-      data: progress
-    });
+    return {status: 'queued', offline: true};
   }
 }
-```
 
-#### Offline Game Features
-- **Complete Gameplay**: All core game mechanics function without internet
-- **Progress Persistence**: Automatic saving of game states and achievements
-- **Offline Assessments**: Quizzes and evaluations with delayed submission
-- **Local Leaderboards**: Classroom-based competition without server dependency
-
-### Data Synchronization Strategy
-
-#### Conflict-Free Replicated Data Types (CRDTs)
-```javascript
-// CRDT implementation for learning progress
-class LearningProgressCRDT {
-  constructor(studentId) {
-    this.studentId = studentId;
-    this.skillLevels = new GCounterCRDT(); // Monotonic skill progression
-    this.achievements = new GSetCRDT();    // Add-only achievement collection
-    this.timeSpent = new PNCounterCRDT();  // Time tracking with corrections
+// Background sync when online
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-submissions') {
+    event.waitUntil(syncQueuedData());
   }
-  
-  merge(otherProgress) {
-    return new LearningProgressCRDT(this.studentId)
-      .setSkillLevels(this.skillLevels.merge(otherProgress.skillLevels))
-      .setAchievements(this.achievements.merge(otherProgress.achievements))
-      .setTimeSpent(this.timeSpent.merge(otherProgress.timeSpent));
-  }
-}
-```
+});
 
-#### Synchronization Phases
-1. **Detection Phase**: Identify changes requiring synchronization
-2. **Prioritization Phase**: Order updates by educational importance
-3. **Transmission Phase**: Efficient delta synchronization
-4. **Merge Phase**: Conflict-free integration of remote changes
-5. **Validation Phase**: Verify data integrity and consistency
-
-### Conflict Resolution Approach
-
-#### Resolution Strategies by Data Type
-- **Learning Progress**: Last-writer-wins with monotonic advancement
-- **Achievements**: Union of all earned achievements (add-only)
-- **Time Spent**: Additive merge with duplicate detection
-- **Content Preferences**: User device takes precedence
-- **Teacher Assignments**: Server authority with local caching
-
-#### Conflict Resolution Algorithm
-```javascript
-class ConflictResolver {
-  resolveConflict(localData, remoteData, dataType) {
-    switch(dataType) {
-      case 'learningProgress':
-        return this.mergeProgress(localData, remoteData);
-      case 'achievements':
-        return this.unionAchievements(localData, remoteData);
-      case 'timeSpent':
-        return this.additiveMerge(localData, remoteData);
-      default:
-        return this.timestampResolution(localData, remoteData);
+async function syncQueuedData() {
+  const queue = await db.getAll('sync-queue');
+  for (const item of queue) {
+    try {
+      await api.post('/submissions', item.data);
+      await db.delete('sync-queue', item.id);
+    } catch (error) {
+      console.error('Sync failed:', error);
     }
   }
 }
 ```
 
----
+**Offline Content Strategy**:
+```
+Pre-cached Content:
+- App shell (HTML, CSS, JS)
+- Critical UI assets
+- User profile and dashboard data
+- Top 10 challenges
+- Recent leaderboard snapshot
 
-## 5. Game & Learning Design
+On-Demand Cache:
+- Challenge details when viewed
+- Learning content when accessed
+- User-generated content (submissions)
 
-### Types of Educational Games
+Cache Size Management:
+- Max cache size: 50MB
+- LRU eviction policy
+- User control over cached content
+```
 
-#### Subject-Specific Game Categories
 
-**Mathematics Games**
-- **Number Adventures**: Story-driven arithmetic with character progression
-- **Geometry Puzzles**: Spatial reasoning through shape manipulation
-- **Algebra Quests**: Variable solving in fantasy adventure contexts
-- **Statistics Simulations**: Data analysis through virtual experiments
+### Conflict Resolution
 
-**Language Arts Games**
-- **Word Building Adventures**: Vocabulary expansion through exploration
-- **Grammar Guardians**: Sentence structure through tower defense mechanics
-- **Reading Comprehension Journeys**: Story-based understanding challenges
-- **Creative Writing Studios**: Collaborative storytelling with peer feedback
-
-**Science Games**
-- **Virtual Laboratory**: Safe experimentation with realistic simulations
-- **Ecosystem Builders**: Environmental science through world creation
-- **Physics Playground**: Mechanics learning through interactive puzzles
-- **Chemistry Crafting**: Molecular understanding through combination games
-
-**Social Studies Games**
-- **Historical Timeline Adventures**: Chronological understanding through time travel
-- **Geography Explorers**: World knowledge through virtual expeditions
-- **Civics Simulators**: Government understanding through role-playing
-- **Cultural Exchange**: Global awareness through character interactions
-
-#### Game Mechanics Integration
+**Optimistic Locking**:
 ```javascript
-// Educational game mechanics framework
-class EducationalGameMechanics {
-  constructor(subject, gradeLevel) {
-    this.subject = subject;
-    this.gradeLevel = gradeLevel;
-    this.mechanics = this.initializeMechanics();
-  }
+// Version-based conflict detection
+async function updateProfile(userId, updates, version) {
+  const result = await db.query(
+    'UPDATE profiles SET data = $1, version = version + 1 
+     WHERE user_id = $2 AND version = $3',
+    [updates, userId, version]
+  );
   
-  initializeMechanics() {
-    return {
-      exploration: new ExplorationMechanic(),
-      collection: new CollectionMechanic(),
-      construction: new ConstructionMechanic(),
-      competition: new CompetitionMechanic(),
-      collaboration: new CollaborationMechanic()
-    };
+  if (result.rowCount === 0) {
+    throw new ConflictError('Profile was modified by another device');
   }
+}
+
+// Client-side conflict resolution
+try {
+  await updateProfile(userId, localChanges, localVersion);
+} catch (ConflictError) {
+  const serverData = await fetchLatestProfile(userId);
+  const merged = mergeChanges(localChanges, serverData);
+  await updateProfile(userId, merged, serverData.version);
 }
 ```
 
-### Progression System Design
-
-#### Multi-Dimensional Progression
+**Last-Write-Wins for Non-Critical Data**:
 ```
-┌─────────────────────────────────────────────────────────┐
-│                 Progression Dimensions                  │
-├─────────────────────────────────────────────────────────┤
-│  Student Level        │  Subject Mastery               │
-│  - Overall Progress   │  - Math Level: 7               │
-│  - Cross-Subject XP   │  - Science Level: 5            │
-│  - Engagement Score   │  - Language Level: 8           │
-├─────────────────────────────────────────────────────────┤
-│  Skill Trees          │  Achievement Collections       │
-│  - Prerequisite Paths │  - Learning Badges             │
-│  - Branching Options  │  - Behavior Recognition        │
-│  - Mastery Indicators │  - Special Accomplishments     │
-└─────────────────────────────────────────────────────────┘
+Applicable to:
+- User preferences
+- UI settings
+- Non-competitive data
+
+Strategy:
+- Use timestamp to determine latest change
+- Server timestamp is authoritative
+- Client accepts server version on conflict
 ```
-
-#### Experience Points (XP) System
-- **Learning XP**: Points earned through lesson completion and skill demonstration
-- **Engagement XP**: Bonus points for consistent daily usage and streak maintenance
-- **Social XP**: Points earned through peer tutoring and collaborative activities
-- **Challenge XP**: Extra points for completing difficult tasks and special events
-
-#### Level Progression Mechanics
-```javascript
-class ProgressionSystem {
-  calculateLevelRequirements(currentLevel) {
-    // Exponential progression with grade-appropriate scaling
-    const baseXP = 100;
-    const growthFactor = 1.5;
-    const gradeMultiplier = this.getGradeMultiplier();
-    
-    return Math.floor(baseXP * Math.pow(growthFactor, currentLevel) * gradeMultiplier);
-  }
-  
-  getGradeMultiplier() {
-    // Adjust progression speed for different age groups
-    const gradeMultipliers = {
-      elementary: 0.8,  // Faster progression for younger students
-      middle: 1.0,      // Standard progression
-      high: 1.2         // Slower, more meaningful progression
-    };
-    return gradeMultipliers[this.gradeCategory];
-  }
-}
-```
-
-### Adaptive Difficulty System
-
-#### Dynamic Difficulty Adjustment (DDA)
-```javascript
-class AdaptiveDifficultyEngine {
-  constructor() {
-    this.performanceWindow = 10; // Last 10 activities
-    this.targetSuccessRate = 0.75; // 75% success rate target
-    this.adjustmentSensitivity = 0.1;
-  }
-  
-  calculateDifficulty(studentHistory) {
-    const recentPerformance = this.getRecentPerformance(studentHistory);
-    const successRate = this.calculateSuccessRate(recentPerformance);
-    
-    if (successRate > this.targetSuccessRate + this.adjustmentSensitivity) {
-      return this.increaseDifficulty();
-    } else if (successRate < this.targetSuccessRate - this.adjustmentSensitivity) {
-      return this.decreaseDifficulty();
-    }
-    
-    return this.maintainDifficulty();
-  }
-}
-```
-
-#### Difficulty Factors
-- **Content Complexity**: Vocabulary level, concept abstraction, problem steps
-- **Time Pressure**: Adjustable time limits based on student comfort level
-- **Hint Availability**: Graduated hint systems for struggling students
-- **Problem Variety**: Diverse question types to maintain engagement
-
-### Subject and Grade Mapping
-
-#### Curriculum Alignment Framework
-```javascript
-class CurriculumMapper {
-  constructor() {
-    this.standards = {
-      'common-core': new CommonCoreStandards(),
-      'international-baccalaureate': new IBStandards(),
-      'national-curriculum': new NationalStandards()
-    };
-  }
-  
-  mapContentToStandards(content, region) {
-    const standardsFramework = this.getRegionalStandards(region);
-    return standardsFramework.alignContent(content);
-  }
-}
-```
-
-#### Grade-Level Content Organization
-- **Prerequisite Mapping**: Clear learning pathways with dependency tracking
-- **Spiral Curriculum**: Concepts revisited with increasing complexity
-- **Cross-Subject Integration**: Connections between different subject areas
-- **Remediation Paths**: Alternative routes for students needing additional support
 
 ---
 
-## 6. Multilingual & Localization Design
+## API Design Principles
 
-### Language Switching Architecture
+### RESTful API Standards
 
-#### Runtime Language Management
-```javascript
-class LocalizationManager {
-  constructor() {
-    this.currentLanguage = this.detectUserLanguage();
-    this.fallbackLanguage = 'en';
-    this.translations = new Map();
-    this.rtlLanguages = ['ar', 'he', 'fa', 'ur'];
-  }
-  
-  async switchLanguage(languageCode) {
-    // Load translation bundle
-    const translations = await this.loadTranslations(languageCode);
-    this.translations.set(languageCode, translations);
-    
-    // Update UI direction for RTL languages
-    if (this.rtlLanguages.includes(languageCode)) {
-      document.dir = 'rtl';
-      document.documentElement.lang = languageCode;
-    }
-    
-    // Trigger UI re-render
-    this.notifyLanguageChange(languageCode);
-  }
-}
+**Endpoint Structure**:
+```
+Base URL: https://api.ecoplatform.in/v1
+
+Resource Naming:
+- Plural nouns: /users, /challenges, /submissions
+- Nested resources: /users/{id}/submissions
+- Actions as sub-resources: /submissions/{id}/verify
+
+HTTP Methods:
+- GET: Retrieve resources
+- POST: Create resources
+- PUT: Full update
+- PATCH: Partial update
+- DELETE: Remove resources
+
+Status Codes:
+- 200: Success
+- 201: Created
+- 204: No content (successful delete)
+- 400: Bad request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not found
+- 409: Conflict
+- 422: Validation error
+- 429: Rate limit exceeded
+- 500: Server error
 ```
 
-#### Language Detection and Selection
-- **Browser Language**: Automatic detection from browser preferences
-- **Geographic Location**: IP-based language suggestions (privacy-compliant)
-- **User Selection**: Manual language picker with visual flags and names
-- **Persistent Preference**: Local storage of language choice across sessions
-
-### Content Translation Workflow
-
-#### Translation Management System
-```
-┌─────────────────────────────────────────────────────────┐
-│              Translation Workflow                       │
-├─────────────────────────────────────────────────────────┤
-│  Source Content    │  Translation Process              │
-│  - English Base    │  - Professional Translation      │
-│  - Structured JSON │  - Community Contribution        │
-│  - Context Metadata│  - Quality Assurance Review      │
-├─────────────────────────────────────────────────────────┤
-│  Localized Output  │  Distribution                     │
-│  - Target Language │  - CDN Deployment                │
-│  - Cultural Adapt. │  - Version Control               │
-│  - Quality Verified│  - Update Notifications          │
-└─────────────────────────────────────────────────────────┘
-```
-
-#### Translation Technologies
-- **i18next**: Comprehensive internationalization framework
-- **React-i18next**: React integration with component-level translations
-- **ICU Message Format**: Complex pluralization and formatting rules
-- **Translation Memory**: Reuse of previously translated content
-
-### Regional Customization
-
-#### Cultural Adaptation Framework
-```javascript
-class CulturalAdapter {
-  constructor(region) {
-    this.region = region;
-    this.culturalSettings = this.loadCulturalSettings(region);
-  }
-  
-  adaptContent(content) {
-    return {
-      ...content,
-      examples: this.localizeExamples(content.examples),
-      currency: this.convertCurrency(content.currency),
-      dateFormat: this.formatDates(content.dates),
-      measurements: this.convertUnits(content.measurements),
-      characters: this.adaptCharacters(content.characters)
-    };
+**Request/Response Format**:
+```json
+// Standard success response
+{
+  "success": true,
+  "data": {
+    "id": "123",
+    "name": "Water Conservation Challenge"
+  },
+  "meta": {
+    "timestamp": "2026-02-28T10:30:00Z",
+    "version": "1.0"
   }
 }
-```
 
-#### Regional Customization Elements
-- **Currency and Units**: Local currency symbols and measurement systems
-- **Date and Time Formats**: Regional date formatting and calendar systems
-- **Cultural References**: Local holidays, traditions, and historical events
-- **Character Representation**: Diverse avatars reflecting local demographics
-- **Educational Standards**: Alignment with national and regional curricula
-
-#### Right-to-Left (RTL) Language Support
-- **CSS Logical Properties**: Direction-agnostic styling with start/end properties
-- **Bidirectional Text**: Proper handling of mixed LTR/RTL content
-- **Icon Mirroring**: Automatic flipping of directional icons and graphics
-- **Layout Adaptation**: Responsive design that works in both directions
-
----
-
-## 7. Teacher Analytics & Dashboards
-
-### Metrics Tracked
-
-#### Student Engagement Metrics
-```javascript
-class EngagementTracker {
-  trackEngagementMetrics(studentId, sessionData) {
-    return {
-      timeMetrics: {
-        sessionDuration: sessionData.endTime - sessionData.startTime,
-        activeTime: this.calculateActiveTime(sessionData.interactions),
-        averageResponseTime: this.calculateResponseTime(sessionData.responses)
-      },
-      interactionMetrics: {
-        clicksPerMinute: sessionData.interactions.length / sessionData.duration,
-        gameCompletionRate: sessionData.completedGames / sessionData.startedGames,
-        helpRequestFrequency: sessionData.helpRequests.length
-      },
-      progressMetrics: {
-        skillsAdvanced: sessionData.skillProgressions.length,
-        achievementsEarned: sessionData.newAchievements.length,
-        streakMaintenance: sessionData.streakStatus
+// Standard error response
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input data",
+    "details": [
+      {
+        "field": "email",
+        "message": "Invalid email format"
       }
-    };
+    ]
+  },
+  "meta": {
+    "timestamp": "2026-02-28T10:30:00Z",
+    "request_id": "req_abc123"
+  }
+}
+
+// Paginated response
+{
+  "success": true,
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 150,
+    "total_pages": 8,
+    "has_next": true,
+    "has_prev": false
   }
 }
 ```
 
-#### Learning Outcome Tracking
-- **Skill Mastery Progression**: Granular tracking of individual skill development
-- **Knowledge Retention**: Spaced repetition effectiveness and long-term retention
-- **Cross-Subject Connections**: Identification of learning transfer between subjects
-- **Misconception Identification**: Pattern recognition for common student errors
-
-#### Behavioral Analytics
-- **Persistence Indicators**: Student response to challenges and setbacks
-- **Collaboration Patterns**: Peer interaction quality and frequency
-- **Help-Seeking Behavior**: Appropriate use of hints and assistance features
-- **Self-Regulation**: Goal-setting and progress monitoring by students
-
-### Visualization Approach
-
-#### Dashboard Design Principles
+**API Versioning**:
 ```
-┌─────────────────────────────────────────────────────────┐
-│                Teacher Dashboard Layout                 │
-├─────────────────────────────────────────────────────────┤
-│  Overview Panel       │  Individual Student Panel      │
-│  - Class Summary      │  - Detailed Progress           │
-│  - Recent Activity    │  - Skill Breakdown            │
-│  - Alerts/Warnings    │  - Engagement Patterns        │
-├─────────────────────────────────────────────────────────┤
-│  Subject Analysis     │  Intervention Recommendations  │
-│  - Performance Trends │  - At-Risk Students           │
-│  - Curriculum Gaps    │  - Suggested Activities       │
-│  - Comparative Data   │  - Parent Communication       │
-└─────────────────────────────────────────────────────────┘
+Strategy: URL versioning
+- /v1/challenges (current)
+- /v2/challenges (future)
+
+Deprecation Policy:
+- 6 months notice before deprecation
+- Support 2 versions simultaneously
+- Clear migration documentation
 ```
 
-#### Interactive Visualization Components
-- **Progress Heat Maps**: Visual representation of class-wide skill mastery
-- **Engagement Timelines**: Chronological view of student activity patterns
-- **Comparative Charts**: Class averages with individual student overlays
-- **Predictive Indicators**: Early warning systems for academic risk
+### GraphQL API (Optional Phase 2)
 
-### Student Performance Insights
-
-#### Automated Insight Generation
-```javascript
-class InsightEngine {
-  generateInsights(studentData, classData) {
-    const insights = [];
-    
-    // Performance trend analysis
-    if (this.detectDecreasingEngagement(studentData)) {
-      insights.push({
-        type: 'warning',
-        message: 'Student engagement has decreased by 25% over the past week',
-        recommendations: ['Schedule one-on-one check-in', 'Adjust difficulty level']
-      });
-    }
-    
-    // Strength identification
-    const strengths = this.identifyStrengths(studentData);
-    if (strengths.length > 0) {
-      insights.push({
-        type: 'positive',
-        message: `Student excels in ${strengths.join(', ')}`,
-        recommendations: ['Leverage strengths for peer tutoring', 'Provide advanced challenges']
-      });
-    }
-    
-    return insights;
-  }
-}
-```
-
-#### Actionable Recommendations
-- **Differentiated Instruction**: Personalized activity suggestions based on learning patterns
-- **Intervention Timing**: Optimal moments for teacher intervention and support
-- **Peer Learning Opportunities**: Identification of beneficial student pairings
-- **Parent Communication**: Automated generation of progress summaries for families
----
-
-## 8. UI/UX Design Guidelines
-
-### Child-Friendly UI Principles
-
-#### Age-Appropriate Design Patterns
-```
-┌─────────────────────────────────────────────────────────┐
-│            Age-Specific Design Guidelines               │
-├─────────────────────────────────────────────────────────┤
-│  Elementary (5-11)    │  Middle School (11-14)         │
-│  - Large Touch Targets│  - Increased Complexity        │
-│  - Bright Colors      │  - Social Features             │
-│  - Simple Navigation │  - Achievement Focus           │
-│  - Audio Feedback    │  - Customization Options       │
-├─────────────────────────────────────────────────────────┤
-│  High School (14-18)  │  Universal Principles          │
-│  - Sophisticated UI   │  - Clear Visual Hierarchy      │
-│  - Advanced Features  │  - Consistent Interactions     │
-│  - Goal-Oriented     │  - Immediate Feedback          │
-│  - Career Relevance   │  - Error Prevention            │
-└─────────────────────────────────────────────────────────┘
-```
-
-#### Visual Design System
-```css
-/* Design token system for consistent UI */
-:root {
-  /* Color Palette - Accessibility Compliant */
-  --primary-blue: #2563eb;
-  --secondary-green: #16a34a;
-  --accent-orange: #ea580c;
-  --neutral-gray: #6b7280;
-  --background-light: #f9fafb;
-  --text-dark: #111827;
-  
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;   /* 12px */
-  --font-size-sm: 0.875rem;  /* 14px */
-  --font-size-base: 1rem;    /* 16px */
-  --font-size-lg: 1.125rem;  /* 18px */
-  --font-size-xl: 1.25rem;   /* 20px */
-  --font-size-2xl: 1.5rem;   /* 24px */
-  
-  /* Spacing System */
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-8: 2rem;     /* 32px */
-}
-```
-
-#### Interactive Element Guidelines
-- **Touch Targets**: Minimum 44px × 44px for reliable touch interaction
-- **Button Design**: Rounded corners, clear labels, and visual feedback states
-- **Navigation**: Breadcrumb trails and clear back buttons for easy orientation
-- **Form Elements**: Large input fields with clear labels and validation messages
-
-### Accessibility Considerations
-
-#### WCAG 2.1 AA Compliance Implementation
-```javascript
-class AccessibilityManager {
-  constructor() {
-    this.screenReaderSupport = new ScreenReaderSupport();
-    this.keyboardNavigation = new KeyboardNavigation();
-    this.colorContrastChecker = new ColorContrastChecker();
-  }
-  
-  enhanceAccessibility(component) {
-    // Add ARIA labels and descriptions
-    this.screenReaderSupport.addARIASupport(component);
-    
-    // Enable keyboard navigation
-    this.keyboardNavigation.addKeyboardSupport(component);
-    
-    // Verify color contrast ratios
-    this.colorContrastChecker.validateContrast(component);
-    
-    // Add focus management
-    this.addFocusManagement(component);
-  }
-}
-```
-
-#### Inclusive Design Features
-- **Screen Reader Compatibility**: Comprehensive ARIA labels and semantic HTML
-- **Keyboard Navigation**: Full functionality accessible via keyboard shortcuts
-- **High Contrast Mode**: Alternative color schemes for visual impairments
-- **Text Scaling**: Support for 200% text zoom without horizontal scrolling
-- **Motor Accessibility**: Adjustable interaction timing and alternative input methods
-
-#### Cognitive Accessibility
-- **Clear Language**: Age-appropriate vocabulary with complexity indicators
-- **Consistent Layout**: Predictable interface patterns across all screens
-- **Progress Indicators**: Clear visual feedback on task completion and navigation
-- **Error Prevention**: Proactive validation and helpful error messages
-
-### Low-End Device Optimization
-
-#### Performance-First Design
-```javascript
-class PerformanceOptimizer {
-  constructor() {
-    this.deviceCapabilities = this.detectDeviceCapabilities();
-    this.adaptiveRendering = new AdaptiveRenderingEngine();
-  }
-  
-  optimizeForDevice() {
-    if (this.deviceCapabilities.isLowEnd) {
-      return {
-        animations: 'reduced',
-        imageQuality: 'compressed',
-        particleEffects: 'disabled',
-        backgroundProcessing: 'minimal'
-      };
-    }
-    
-    return this.getStandardConfiguration();
-  }
-}
-```
-
-#### Resource Management Strategies
-- **Lazy Loading**: Progressive loading of content as needed
-- **Image Optimization**: WebP format with JPEG fallbacks, responsive sizing
-- **Code Splitting**: Dynamic imports for feature-based loading
-- **Memory Management**: Automatic cleanup of unused components and assets
-
-#### Responsive Design Approach
-```css
-/* Mobile-first responsive design */
-.learning-interface {
-  /* Base styles for mobile devices */
-  padding: var(--space-4);
-  font-size: var(--font-size-base);
+**Schema Design**:
+```graphql
+type User {
+  id: ID!
+  email: String!
+  profile: Profile!
+  points: UserPoints!
+  badges: [Badge!]!
+  submissions(limit: Int, offset: Int): [Submission!]!
 }
 
-@media (min-width: 768px) {
-  .learning-interface {
-    /* Tablet optimizations */
-    padding: var(--space-6);
-    font-size: var(--font-size-lg);
-  }
+type Challenge {
+  id: ID!
+  title: String!
+  description: String!
+  category: ChallengeCategory!
+  difficulty: Difficulty!
+  points: Int!
+  submissions(userId: ID!): [Submission!]!
 }
 
-@media (min-width: 1024px) {
-  .learning-interface {
-    /* Desktop enhancements */
-    padding: var(--space-8);
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-  }
+type Query {
+  me: User!
+  challenge(id: ID!): Challenge
+  challenges(filter: ChallengeFilter, limit: Int, offset: Int): [Challenge!]!
+  leaderboard(type: LeaderboardType!, scopeId: ID!): Leaderboard!
 }
-```
 
-#### Battery and Data Optimization
-- **Dark Mode**: Reduced power consumption on OLED displays
-- **Efficient Animations**: CSS transforms and opacity changes only
-- **Data Compression**: Gzip compression for all text-based resources
-- **Background Processing**: Minimal CPU usage during idle periods
-
----
-
-## 9. Security & Privacy Design
-
-### Student Data Protection
-
-#### Privacy-by-Design Architecture
-```javascript
-class PrivacyManager {
-  constructor() {
-    this.dataMinimization = new DataMinimizationEngine();
-    this.consentManager = new ConsentManager();
-    this.encryptionService = new EncryptionService();
-  }
-  
-  collectData(dataType, purpose, studentAge) {
-    // Check if data collection is necessary
-    if (!this.dataMinimization.isNecessary(dataType, purpose)) {
-      return this.rejectCollection('Data not necessary for educational purpose');
-    }
-    
-    // Verify age-appropriate consent
-    if (studentAge < 13 && !this.consentManager.hasParentalConsent()) {
-      return this.requestParentalConsent();
-    }
-    
-    // Encrypt sensitive data
-    return this.encryptionService.encrypt(data);
-  }
+type Mutation {
+  submitChallenge(input: SubmissionInput!): Submission!
+  verifySubmission(id: ID!, decision: VerificationDecision!, feedback: String): Submission!
+  updateProfile(input: ProfileInput!): Profile!
 }
-```
 
-#### COPPA and GDPR Compliance
-- **Minimal Data Collection**: Only educationally necessary information
-- **Parental Consent**: Verified consent for students under 13
-- **Data Portability**: Easy export of student data in standard formats
-- **Right to Deletion**: Complete removal of student data upon request
-- **Transparent Processing**: Clear explanations of data use and retention
-
-#### Local Data Protection
-```javascript
-class LocalDataSecurity {
-  constructor() {
-    this.encryption = new AESEncryption();
-    this.keyManager = new LocalKeyManager();
-  }
-  
-  secureLocalStorage(sensitiveData) {
-    const encryptionKey = this.keyManager.getOrCreateKey();
-    const encryptedData = this.encryption.encrypt(sensitiveData, encryptionKey);
-    
-    // Store encrypted data in IndexedDB
-    return this.storeEncrypted(encryptedData);
-  }
+type Subscription {
+  leaderboardUpdated(type: LeaderboardType!, scopeId: ID!): Leaderboard!
+  notificationReceived(userId: ID!): Notification!
 }
-```
-
-### Authentication Approach
-
-#### Age-Appropriate Authentication
-```
-┌─────────────────────────────────────────────────────────┐
-│              Authentication Strategy                    │
-├─────────────────────────────────────────────────────────┤
-│  Elementary Students  │  Older Students                │
-│  - Picture Passwords  │  - Traditional Login           │
-│  - QR Code Login     │  - Social Login Options        │
-│  - Teacher-Assisted  │  - Two-Factor Authentication   │
-├─────────────────────────────────────────────────────────┤
-│  Teachers            │  Administrators                 │
-│  - SSO Integration   │  - Advanced Security           │
-│  - Multi-Factor Auth│  - Audit Logging               │
-│  - Role-Based Access │  - Session Management          │
-└─────────────────────────────────────────────────────────┘
-```
-
-#### Secure Session Management
-- **JWT Tokens**: Stateless authentication with short expiration times
-- **Refresh Tokens**: Secure token renewal without password re-entry
-- **Session Timeout**: Automatic logout after inactivity periods
-- **Device Binding**: Token validation tied to specific device characteristics
-
-### Compliance Considerations
-
-#### Educational Data Privacy Standards
-```javascript
-class ComplianceChecker {
-  constructor() {
-    this.regulations = {
-      coppa: new COPPACompliance(),
-      gdpr: new GDPRCompliance(),
-      ferpa: new FERPACompliance(),
-      pipeda: new PIPEDACompliance()
-    };
-  }
-  
-  validateCompliance(operation, userData) {
-    const applicableRegulations = this.determineApplicableRegulations(userData.location);
-    
-    return applicableRegulations.every(regulation => 
-      this.regulations[regulation].validate(operation, userData)
-    );
-  }
-}
-```
-
-#### Data Retention and Deletion
-- **Automatic Purging**: Scheduled deletion of unnecessary data
-- **Retention Policies**: Clear timelines for different data types
-- **Audit Trails**: Comprehensive logging of data access and modifications
-- **Breach Response**: Incident response procedures and notification systems
-
----
-
-## 10. Scalability & Future Enhancements
-
-### Adding New Subjects and Games
-
-#### Modular Content Architecture
-```javascript
-class ContentManagementSystem {
-  constructor() {
-    this.contentRegistry = new ContentRegistry();
-    this.gameEngine = new ModularGameEngine();
-    this.curriculumMapper = new CurriculumMapper();
-  }
-  
-  addNewSubject(subjectConfig) {
-    // Register subject with curriculum standards
-    this.curriculumMapper.registerSubject(subjectConfig);
-    
-    // Create game templates for the subject
-    const gameTemplates = this.gameEngine.generateTemplates(subjectConfig);
-    
-    // Register content with the system
-    return this.contentRegistry.register({
-      subject: subjectConfig.name,
-      games: gameTemplates,
-      assessments: subjectConfig.assessments,
-      standards: subjectConfig.standards
-    });
-  }
-}
-```
-
-#### Content Creation Framework
-- **Template System**: Reusable game templates for rapid content development
-- **Asset Library**: Shared multimedia resources across subjects
-- **Localization Pipeline**: Automated translation workflows for new content
-- **Quality Assurance**: Automated testing and validation for educational content
-
-### AI-Based Personalization (Future Scope)
-
-#### Machine Learning Integration
-```javascript
-class PersonalizationEngine {
-  constructor() {
-    this.learningAnalytics = new LearningAnalyticsML();
-    this.recommendationSystem = new RecommendationSystem();
-    this.adaptiveTesting = new AdaptiveTestingEngine();
-  }
-  
-  async personalizeExperience(studentProfile) {
-    // Analyze learning patterns
-    const learningStyle = await this.learningAnalytics.analyzeLearningStyle(studentProfile);
-    
-    // Generate personalized recommendations
-    const recommendations = await this.recommendationSystem.generateRecommendations(
-      studentProfile, 
-      learningStyle
-    );
-    
-    // Adapt assessment difficulty
-    const adaptiveAssessments = await this.adaptiveTesting.createPersonalizedTests(
-      studentProfile.skillLevels
-    );
-    
-    return {
-      learningStyle,
-      recommendations,
-      adaptiveAssessments
-    };
-  }
-}
-```
-
-#### AI-Powered Features (Roadmap)
-- **Intelligent Tutoring**: AI-driven personalized instruction and feedback
-- **Natural Language Processing**: Conversational interfaces for student support
-- **Predictive Analytics**: Early identification of learning difficulties
-- **Automated Content Generation**: AI-created practice problems and assessments
-
-### Integration with School Systems
-
-#### API-First Architecture
-```javascript
-class SchoolSystemIntegration {
-  constructor() {
-    this.apiGateway = new APIGateway();
-    this.dataMapper = new SchoolDataMapper();
-    this.syncManager = new BidirectionalSyncManager();
-  }
-  
-  integrateWithSIS(schoolSystem) {
-    // Map school system data structures
-    const dataMapping = this.dataMapper.createMapping(schoolSystem.schema);
-    
-    // Establish secure API connection
-    const connection = this.apiGateway.connect(schoolSystem.endpoint, {
-      authentication: schoolSystem.authConfig,
-      dataMapping: dataMapping
-    });
-    
-    // Set up bidirectional synchronization
-    return this.syncManager.establishSync(connection);
-  }
-}
-```
-
-#### Integration Capabilities
-- **Student Information Systems**: Automated roster and grade synchronization
-- **Learning Management Systems**: Content sharing and assignment integration
-- **Assessment Platforms**: Standardized test preparation and score reporting
-- **Parent Communication**: Integration with existing parent portal systems
-
-#### Deployment Scalability
-```
-┌─────────────────────────────────────────────────────────┐
-│                Scalability Architecture                 │
-├─────────────────────────────────────────────────────────┤
-│  Regional Deployment  │  Global Distribution           │
-│  - Local Data Centers │  - Multi-CDN Strategy          │
-│  - Compliance Zones   │  - Edge Computing              │
-│  - Language Clusters  │  - Auto-Scaling Groups         │
-├─────────────────────────────────────────────────────────┤
-│  Performance Tiers    │  Resource Optimization         │
-│  - Basic (1K users)   │  - Containerized Services      │
-│  - Standard (10K)     │  - Microservices Architecture  │
-│  - Enterprise (100K+) │  - Database Sharding           │
-└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Implementation Roadmap
+## Technology Stack
 
-### Phase 1: Core Platform (Months 1-6)
-- **MVP Development**: Basic PWA with offline functionality
-- **Core Games**: 5 game types across Math and Language Arts
-- **Teacher Dashboard**: Essential analytics and progress tracking
-- **Multilingual Support**: 5 initial languages with full localization
+### Frontend
 
-### Phase 2: Enhanced Features (Months 7-12)
-- **Advanced Gamification**: Complete achievement and progression systems
-- **Additional Subjects**: Science and Social Studies content integration
-- **Improved Analytics**: Predictive insights and intervention recommendations
-- **Accessibility Enhancements**: Full WCAG 2.1 AA compliance
+**Progressive Web App (PWA)**:
+- Core: HTML5, CSS3, Vanilla JavaScript (ES6+)
+- Architecture: Offline-first PWA with Service Workers
+- UI Framework: Custom CSS3 with lightweight animations
+- Game Engine: Phaser.js (2D educational games)
+- Animation: CreateJS for interactive content
+- Graphics: HTML5 Canvas/SVG for custom visualizations
+- Charts: Chart.js for analytics visualization
+- Maps: Leaflet (lightweight mapping library)
+- Offline Storage: IndexedDB + LocalStorage + Cache API
+- Internationalization: i18next (vanilla JS compatible)
+- Web App Manifest: Installable app experience
 
-### Phase 3: Scale and Intelligence (Months 13-18)
-- **AI Integration**: Basic personalization and adaptive learning
-- **School System Integration**: API development and pilot integrations
-- **Advanced Offline**: Peer-to-peer content sharing and collaboration
-- **Global Expansion**: 20+ languages and regional customizations
+**Why Vanilla JavaScript PWA**:
+- Smaller bundle size (<500KB vs 2MB+ for frameworks)
+- Faster performance on low-end devices
+- Works as web and installable mobile app
+- Complete offline functionality
+- No app store dependency
+- Efficient on low-cost Android phones and laptops
+- Direct DOM manipulation for optimal performance
 
-### Phase 4: Advanced Platform (Months 19-24)
-- **Advanced AI**: Intelligent tutoring and natural language processing
-- **Enterprise Features**: White-labeling and advanced administration
-- **Research Integration**: Learning analytics research partnerships
-- **Ecosystem Development**: Third-party developer platform and marketplace
+
+### Backend
+
+**API Services** (Lightweight & Scalable):
+- Runtime: Node.js 20 LTS
+- Framework: Express.js (minimal, fast)
+- Language: JavaScript (ES6+)
+- Validation: Joi
+- Database Access: pg (PostgreSQL native driver)
+- Authentication: JWT (jsonwebtoken library)
+- File Upload: Multer
+- Task Queue: Simple queue with Redis (optional)
+- Cron Jobs: node-cron
+- Testing: Jest
+
+**Why Lightweight Backend**:
+- Most learning activities work offline
+- Backend primarily for progress sync, teacher analytics, content updates
+- Minimal server load due to offline-first architecture
+- Cost-effective hosting on free/low-cost platforms
+
+**Optional AI/ML** (Phase 2):
+- TensorFlow.js (client-side ML for privacy)
+- On-device personalization and adaptive learning
+
+### Databases
+
+**Primary Database**:
+- PostgreSQL 15 (recommended for analytics and user management)
+- Alternative: MySQL 8.0 (lightweight option for smaller deployments)
+- Extensions: PostGIS (location data)
+- Connection Pooling: pg-pool
+
+**Offline Sync Database** (Optional):
+- CouchDB + PouchDB (excellent offline-first synchronization)
+- Automatic conflict resolution
+- Seamless data merging across devices
+
+**Cache & Session Store** (Optional):
+- Redis 7.2 (for high-traffic scenarios)
+- Use Cases: Session storage, rate limiting, leaderboard cache
+
+**Client-Side Storage**:
+- IndexedDB (lessons, games, progress, assessment scores)
+- LocalStorage (user settings, language preferences, UI state)
+- Cache API (static assets, games, images, educational media)
+
+### Cloud Infrastructure
+
+**Low-Cost/Free Deployment Options**:
+
+**Frontend (PWA)**:
+- Netlify (free tier with global CDN, automatic deployments)
+- Vercel (optimized hosting with edge functions)
+- GitHub Pages (free static hosting for PWA)
+- Cloudflare Pages (free with Cloudflare CDN)
+
+**Backend Services**:
+- Render (simple backend hosting with PostgreSQL support)
+- Railway (developer-friendly with database integration)
+- Fly.io (global application deployment with edge computing)
+- Heroku (free/low-cost tier for small deployments)
+
+**Database Hosting**:
+- Render PostgreSQL (free tier available)
+- Railway PostgreSQL (included with backend)
+- Supabase (free PostgreSQL with built-in features)
+- ElephantSQL (free PostgreSQL hosting)
+
+**Content Delivery**:
+- Cloudflare (free tier CDN for global asset delivery)
+- Netlify CDN (included with hosting)
+- jsDelivr (free CDN for static assets)
+
+**Optional Cloud Services** (Scale Phase):
+- AWS S3 (media storage)
+- AWS CloudFront (CDN)
+- AWS RDS (managed PostgreSQL)
+- DigitalOcean (cost-effective VPS)
+
+### DevOps & CI/CD
+
+**Version Control**:
+- Git (GitHub / GitLab)
+- Branching: GitFlow
+- Code Review: Pull Requests
+
+**CI/CD Pipeline**:
+- GitHub Actions (free for public repos)
+- Automated testing on push
+- Automatic deployment to Netlify/Vercel/Render
+- Rollback via Git revert
+
+**Containerization** (Optional):
+- Docker (for backend services)
+- Docker Compose (local development)
+
+**Monitoring & Observability**:
+- Built-in platform monitoring (Netlify/Vercel/Render)
+- Sentry (free tier for error tracking)
+- Google Analytics (web analytics)
+- Custom logging to PostgreSQL
+- Uptime monitoring (UptimeRobot free tier)
+
+### Third-Party Integrations
+
+**Authentication**:
+- Phone number/School ID login (simple authentication)
+- JWT tokens (secure session management)
+- Optional OTP via SMS gateway (Twilio/MSG91)
+
+**Communication**:
+- Email: Free SMTP or SendGrid free tier
+- SMS: Optional via MSG91 (India) or Twilio
+- Push Notifications: Web Push API (built into PWA)
+
+**Media Processing**:
+- Client-side image compression (browser-native)
+- Canvas API for image manipulation
+- Optional: TensorFlow.js for image verification
+
+**Analytics**:
+- Google Analytics (free web analytics)
+- Custom analytics stored in PostgreSQL
+- Chart.js for visualization
+
+**Maps & Location**:
+- Leaflet with OpenStreetMap (completely free)
+- Geolocation API (browser-native)
+
+**AI/ML** (Phase 2):
+- TensorFlow.js (client-side ML)
+- Web Speech API (voice-based learning)
+- On-device personalization for privacy
 
 ---
 
-*This design document serves as the comprehensive technical and UX specification for iconikLearn, providing detailed guidance for development teams, designers, and stakeholders throughout the implementation process.*
+## Deployment Architecture
+
+### Environment Strategy
+
+**Environments**:
+1. Development (dev)
+2. Staging (staging)
+3. Production (prod)
+
+**Environment Configuration**:
+```
+Development:
+- Single instance per service
+- Shared database
+- Minimal caching
+- Debug logging enabled
+- Auto-deploy on commit to dev branch
+
+Staging:
+- Production-like setup (scaled down)
+- Separate database with production-like data
+- Full caching enabled
+- Production logging
+- Auto-deploy on commit to staging branch
+- Used for QA and UAT
+
+Production:
+- Multi-instance per service (auto-scaling)
+- High-availability database setup
+- Full caching and CDN
+- Production logging and monitoring
+- Manual approval for deployment
+- Blue-green deployment strategy
+```
+
+
+### Deployment Workflow
+
+**CI/CD Pipeline**:
+```
+1. Code Commit
+   ↓
+2. Automated Tests
+   - Unit tests
+   - Integration tests
+   - Linting and code quality checks
+   ↓
+3. Build Docker Images
+   - Tag with commit SHA
+   - Push to container registry
+   ↓
+4. Deploy to Staging
+   - Run database migrations
+   - Deploy services
+   - Run smoke tests
+   ↓
+5. Manual Approval (Production)
+   ↓
+6. Deploy to Production
+   - Blue-green deployment
+   - Health checks
+   - Gradual traffic shift
+   ↓
+7. Post-Deployment
+   - Monitor metrics
+   - Alert on anomalies
+   - Automatic rollback on failure
+```
+
+**Blue-Green Deployment**:
+```
+1. Current production (Blue) serving 100% traffic
+2. Deploy new version to Green environment
+3. Run health checks on Green
+4. Shift 10% traffic to Green (canary)
+5. Monitor metrics for 10 minutes
+6. If healthy: Shift 50% traffic to Green
+7. Monitor for 10 minutes
+8. If healthy: Shift 100% traffic to Green
+9. Keep Blue running for 1 hour (quick rollback)
+10. Decommission Blue environment
+```
+
+### Disaster Recovery
+
+**Backup Strategy**:
+```
+Database Backups:
+- Automated daily backups (retained 30 days)
+- Weekly backups (retained 3 months)
+- Monthly backups (retained 1 year)
+- Point-in-time recovery (7 days)
+
+Media Backups:
+- S3 versioning enabled
+- Cross-region replication
+- Lifecycle policies for cost optimization
+
+Configuration Backups:
+- Infrastructure as Code in Git
+- Secrets backed up in secure vault
+```
+
+**Recovery Objectives**:
+```
+RTO (Recovery Time Objective): 4 hours
+RPO (Recovery Point Objective): 1 hour
+
+Recovery Procedures:
+1. Detect failure (automated monitoring)
+2. Assess impact and root cause
+3. Decide: Rollback vs. Fix forward
+4. Execute recovery plan
+5. Restore from backup if needed
+6. Verify system functionality
+7. Resume normal operations
+8. Post-mortem analysis
+```
+
+**High Availability Setup**:
+```
+Multi-AZ Deployment:
+- Services deployed across 3 availability zones
+- Database with multi-AZ replication
+- Load balancer distributes across AZs
+- Automatic failover on AZ failure
+
+Health Checks:
+- Application health endpoint: /health
+- Database connectivity check
+- External dependency checks
+- Response time monitoring
+- Automatic instance replacement on failure
+```
+
+---
+
+## Future Extensibility Considerations
+
+### Modular Architecture
+
+**Plugin System** (Phase 3):
+```
+Allow institutions to create custom challenges and integrations:
+- Challenge templates
+- Custom verification rules
+- Third-party integrations
+- Custom reward systems
+- Institutional branding
+```
+
+**API Marketplace** (Phase 3):
+```
+Enable third-party developers to build on the platform:
+- Public API with OAuth 2.0
+- Developer portal with documentation
+- Sandbox environment
+- Rate limiting and quotas
+- Revenue sharing model
+```
+
+### AI/ML Enhancements
+
+**Client-Side AI with TensorFlow.js** (Phase 2):
+```
+- On-device machine learning for privacy
+- Personalized challenge recommendations
+- Adaptive difficulty based on user performance
+- Image verification (client-side processing)
+- Offline ML inference
+- No data sent to external servers
+```
+
+**Advanced Features** (Phase 2):
+```
+- Web Speech API for voice-based learning
+- Speech recognition for accessibility
+- Text-to-speech for content delivery
+- Client-side image classification
+- Pattern recognition for fraud detection
+- Sentiment analysis (lightweight models)
+```
+
+**Why Client-Side ML**:
+```
+- Privacy-first approach (data stays on device)
+- Works offline
+- No server costs for ML inference
+- Faster response times
+- Suitable for low-end devices with optimized models
+```
+
+### Gamification Evolution
+
+**Phaser.js Game Integration** (Phase 1-2):
+```
+- 2D educational mini-games
+- Interactive environmental simulations
+- Puzzle games for learning concepts
+- Timed challenges and quizzes
+- Multiplayer classroom competitions
+- Achievement animations
+- Custom game levels based on curriculum
+```
+
+**Advanced Features** (Phase 2-3):
+```
+- CreateJS animations for interactive content
+- Canvas-based visualizations
+- Peer-to-peer local multiplayer
+- Social features (clubs, teams, tournaments)
+- Live events and competitions
+- Offline game progress sync
+```
+
+**Why Phaser.js**:
+```
+- Lightweight and performant
+- Works offline
+- Runs on low-end devices
+- Rich ecosystem for educational games
+- HTML5 Canvas-based (no plugins needed)
+- Mobile-friendly touch controls
+```
+
+### Integration Expansion
+
+**Educational Platforms** (Phase 2):
+```
+- Simple REST API for LMS integration
+- CSV export/import for Student Information Systems
+- Webhook support for real-time updates
+- Standard authentication protocols
+```
+
+**Environmental Organizations** (Phase 2):
+```
+- Carbon footprint calculator (client-side)
+- Simple API for data sharing
+- CSV/JSON export for reporting
+- Public API for verified NGOs
+```
+
+**Government Systems** (Phase 3):
+```
+- Read-only API for government dashboards
+- Aggregated data export (privacy-compliant)
+- Standard reporting formats
+- Secure data sharing protocols
+```
+
+**Extreme Low Connectivity** (Phase 2):
+```
+- SMS-based sync for limited internet areas
+- Peer-to-peer content sharing via local network
+- Bluetooth file transfer for offline content
+- Progressive enhancement for 2G networks
+```
+
+### Internationalization
+
+**Global Expansion** (Phase 3):
+```
+- Multi-country support
+- Currency localization
+- Regional environmental challenges
+- International leaderboards
+- Compliance with regional regulations
+- Partnerships with global NGOs
+```
+
+---
+
+## Performance Optimization
+
+### Frontend Optimization
+
+**Vanilla JavaScript Optimization**:
+```javascript
+// Lazy load modules
+async function loadModule(moduleName) {
+  const module = await import(`./modules/${moduleName}.js`);
+  return module;
+}
+
+// Intersection Observer for lazy loading
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      loadContent(entry.target);
+    }
+  });
+});
+```
+
+**Image Optimization**:
+```
+- WebP format with JPEG/PNG fallback
+- Responsive images (srcset and sizes)
+- Lazy loading with Intersection Observer
+- Client-side compression before upload
+- Progressive JPEG for faster perceived load
+- CDN delivery via Cloudflare
+```
+
+**Bundle Optimization**:
+```
+- Minification with Terser
+- Gzip/Brotli compression
+- Critical CSS inlining
+- Defer non-critical JavaScript
+- Code splitting by route
+- Target bundle size: <500KB total, <100KB initial load
+- No framework overhead
+```
+
+**PWA Performance**:
+```
+- Service Worker caching strategies
+- Cache-first for static assets
+- Network-first for API calls with cache fallback
+- Background sync for offline submissions
+- IndexedDB for large data storage
+- LocalStorage for quick access data
+```
+
+### Backend Optimization
+
+**Database Query Optimization**:
+```sql
+-- Use indexes for frequent queries
+CREATE INDEX idx_submissions_user_status 
+ON submissions(user_id, verification_status);
+
+-- Use covering indexes
+CREATE INDEX idx_leaderboard_cover 
+ON user_points(institution_id, total_points DESC) 
+INCLUDE (user_id, level);
+
+-- Optimize N+1 queries with joins
+SELECT u.*, p.*, up.total_points 
+FROM users u
+JOIN profiles p ON u.id = p.user_id
+JOIN user_points up ON u.id = up.user_id
+WHERE u.institution_id = $1;
+```
+
+**API Response Optimization**:
+```
+- Field selection (return only requested fields)
+- Pagination (limit result sets)
+- Compression (gzip responses)
+- ETags (conditional requests)
+- Batch endpoints (reduce round trips)
+```
+
+**Caching Strategy**:
+```
+Cache Hit Rate Target: 80%+
+
+High-value cache targets:
+- User profiles (15 min TTL)
+- Challenge lists (5 min TTL)
+- Leaderboards (1 min TTL)
+- Static content (1 day TTL)
+- API responses (varies by endpoint)
+```
+
+---
+
+## Monitoring & Alerting
+
+### Key Metrics
+
+**Application Metrics**:
+```
+- Request rate (requests/second)
+- Response time (p50, p95, p99)
+- Error rate (errors/total requests)
+- Availability (uptime percentage)
+- Active users (concurrent users)
+- Database connections (active/idle)
+```
+
+**Business Metrics**:
+```
+- Daily Active Users (DAU)
+- Challenge completion rate
+- Verification queue depth
+- Average verification time
+- User retention rate
+- Feature adoption rate
+```
+
+**Infrastructure Metrics**:
+```
+- CPU utilization
+- Memory usage
+- Disk I/O
+- Network throughput
+- Database query time
+- Cache hit rate
+```
+
+### Alerting Rules
+
+**Critical Alerts** (Immediate Response):
+```
+- Service down (availability < 99%)
+- Error rate > 5%
+- Response time p95 > 3 seconds
+- Database connection pool exhausted
+- Disk space > 90%
+- Security breach detected
+```
+
+**Warning Alerts** (Monitor Closely):
+```
+- Error rate > 1%
+- Response time p95 > 1 second
+- CPU utilization > 80%
+- Memory usage > 85%
+- Cache hit rate < 70%
+- Verification queue > 1000
+```
+
+**Notification Channels**:
+```
+- PagerDuty (critical alerts)
+- Slack (all alerts)
+- Email (daily summary)
+- SMS (critical only, on-call engineer)
+```
+
+---
+
+*Document Version: 1.0*  
+*Last Updated: February 2026*  
+*Classification: Internal - Technical Design*
